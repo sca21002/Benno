@@ -46,6 +46,31 @@ __PACKAGE__->config(
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
     enable_catalyst_header => 1, # Send X-Catalyst header
+
+    authentication => {
+        default_realm => 'users',
+        realms        => {
+            users => {
+                credential => {
+                    class          => 'Password',
+                    password_field => 'password',
+                    password_type  => 'self_check'
+                },
+                store => {
+                    class         => 'DBIx::Class',
+                    user_model    => 'DB::User',
+                    role_relation => 'roles',
+                    role_field    => 'name',
+                }
+            }
+        },
+    },
+    'Controller::Login' => {
+        traits => ['-RenderAsTTTemplate'],
+        login_form_args => {
+            authenticate_args => { active => 'Y' },
+        },
+    },
 );
 
 # Start the application

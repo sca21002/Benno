@@ -21,6 +21,9 @@ requires 'CatalystX::SimpleLogin';
 requires 'Catalyst::Plugin::Session';
 requires 'Catalyst::Plugin::Session::Store::File';
 requires 'Catalyst::Plugin::Session::State::Cookie';
+requires 'Catalyst::Plugin::Authorization::Roles';
+requires 'DBIx::Class::PassphraseColumn';
+requires 'Authen::Passphrase::BlowfishCrypt';
 
 test_requires 'Test::More' => '0.88';
 catalyst;
