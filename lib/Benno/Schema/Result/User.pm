@@ -57,7 +57,14 @@ __PACKAGE__->table("users");
   is_nullable: 1
   size: 255
 
-=head2 email
+=head2 password_expires
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  default_value: current_timestamp
+  is_nullable: 0
+
+=head2 email_address
 
   data_type: 'varchar'
   is_nullable: 1
@@ -94,7 +101,14 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "password",
   { data_type => "varchar", is_nullable => 1, size => 255 },
-  "email",
+  "password_expires",
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    default_value => \"current_timestamp",
+    is_nullable => 0,
+  },
+  "email_address",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "first_name",
   { data_type => "varchar", is_nullable => 1, size => 255 },
@@ -118,21 +132,21 @@ __PACKAGE__->set_primary_key("id");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<email>
+=head2 C<email_address>
 
 =over 4
 
-=item * L</email>
+=item * L</email_address>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint("email", ["email"]);
+__PACKAGE__->add_unique_constraint("email_address", ["email_address"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-04-28 16:04:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v1IO+DHlMGPV1esQyIjBXQ
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-04-29 16:30:39
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lX/7z62oFWHkLhq746t8UQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

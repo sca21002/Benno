@@ -20,6 +20,12 @@ use Catalyst qw/
     -Debug
     ConfigLoader
     Static::Simple
+    Session
+    Session::Store::File
+    Session::State::Cookie
+    Authentication
+    Authorization::Roles
+    +CatalystX::SimpleLogin
 /;
 
 extends 'Catalyst';
