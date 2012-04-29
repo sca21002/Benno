@@ -20,18 +20,20 @@ Benno::Controller::Root - Root Controller for Benno
 
 =head1 METHODS
 
-=head2 index
+=head2 home
 
 The root page (/)
 
 =cut
 
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-
-    # Hello World
-    $c->response->body( $c->welcome_message );
+sub base : Chained('/login/required') PathPart('') CaptureArgs(0) {}
+ 
+sub home : Chained('/base') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+ 
+    $c->res->redirect($c->uri_for('/label/list'));
 }
+ 
 
 =head2 default
 
@@ -39,12 +41,12 @@ Standard 404 error page
 
 =cut
 
-sub default :Path {
-    my ( $self, $c ) = @_;
-    $c->response->body( 'Page not found' );
-    $c->response->status(404);
+sub default : Chained('/base') PathPart('') Args {
+    my ($self, $c) = @_;
+    $c->res->body('Page not found');
+    $c->res->status(404);
 }
-
+ 
 =head2 end
 
 Attempt to render a view, if needed.
