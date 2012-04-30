@@ -47,8 +47,9 @@ sub labels_type : Chained('labels') PathPart('') CaptureArgs(1) {
 sub list : Chained('labels_type') PathPart('list') Args(0) {
     my ( $self, $c ) = @_;
     
+    $c->log->debug('URI for action: ' . $c->uri_for_action('/label/json',  $c->req->captures));
     $c->stash(
-	json_url => $c->uri_for_action('label/json')
+	json_url => $c->uri_for_action('/label/json', $c->req->captures)
     );
 }
 

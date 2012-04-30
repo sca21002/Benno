@@ -11,7 +11,7 @@ use Carp;
 sub new_from_string {
     my ($self, $signatur_str) = @_;
     
-    warn 'Signatur-Str: ' . $signatur_str;
+    #warn 'Signatur-Str: ' . $signatur_str;
     croak $signatur_str unless $signatur_str;
     my $class_name;
     if ($signatur_str =~ /\*/) {

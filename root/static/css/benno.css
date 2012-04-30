@@ -1,0 +1,212 @@
+body {
+	font-family: Verdana, Tahoma, sans-serif;
+	color: #605E5D;
+	font-size: 97%;
+	margin: 0;
+	padding: 0;
+	font-size: 97%;
+	margin: 0;
+	padding: 0;
+	background-color: #E4F3F6;
+}
+
+a,a:link {
+	color: #605E5D;
+}
+
+a:visited {
+	text-decoration: underline;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:active {
+	text-decoration: underline;
+}
+
+#header {
+	background-image: url("../images/Benno_logo_tp_weiss.png");
+	background-repeat: no-repeat;
+	height: 86px;
+	width: 242px;
+	margin-top: 10px;
+}
+
+#header a {
+	height: 86px;
+	width: 242px;
+	margin-top: 10px;
+	  padding: 71px 137px;
+}
+
+#container {
+	width: 800px;
+	margin: 4px auto 0;
+}
+
+ul#navigation li a,ul#fachbereiche li a {
+	text-decoration: none;
+	font-size: 17px;
+}
+
+
+ul#navigation li a {
+	padding: 8px 7px;
+
+}
+
+ul#navigation,ul#breadcrumbs,ul#subnav,ul#fachbereiche {
+	list-style-type: none;
+	padding-left: 0;
+}
+
+ul#subnav li {
+	border-left: 2px solid #e4f3f6;
+	float: left;
+	padding: 4px 8px;
+	background-color: white;
+	margin-bottom: -1px;
+}
+
+ul#subnav li:FIRST-CHILD {
+	border-left: 0px;
+}
+
+ul#subnav li:HOVER, ul#subnav li a:HOVER, ul#subnav li input:HOVER {
+	background-color: cadetblue;
+	color: white !important;
+}
+
+ul#subnav {
+	float: right;
+	margin-bottom: 0px;	
+}
+
+
+#subnav {	
+	font-size: 96%;
+}
+
+ul#subnav li a, ul#subnav li input {
+	text-decoration: none;	
+	height: 100%;
+	width: 100%;
+}
+
+ul#subnav li input {
+ background-color: white;
+ border: none;
+ margin-top: -2px;
+ 
+}
+
+
+
+ul#navigation li {
+	float: left;
+	padding: 10px 40px;
+	border-right: 1px solid #E4F3F6;
+}
+
+
+ul#fachbereiche {
+	    margin-left: -11px;
+	    margin-right: -23px;
+	    margin-top: -19px;
+    
+}
+ul#fachbereiche li {
+	background-color: powderblue;
+    border-left: 2px solid #E4F3F6;
+    float: left;
+    height: 138px;    
+    width: 159px;
+}
+
+ul#fachbereiche li a {
+    display: block;
+    text-align: center;
+    vertical-align: middle;
+    padding: 49px 10px;
+}
+
+ul#fachbereiche li a:HOVER, ul#navigation li a:HOVER {
+	color: white;
+}
+
+ul#fachbereiche li:FIRST-CHILD {
+	border-left: 0px;
+}
+
+ul#fachbereiche li:HOVER {
+	background-color: cadetblue;
+}
+
+ul#navigation li:HOVER {
+	background-color: cadetblue; 
+	height: 20px;
+	color: white !important;
+}
+
+li.active {
+	background-image: url("../images/pfeil.png");
+	background-position: 48% 39px;
+	background-repeat: no-repeat;
+	height: 45px;
+	overflow: visible;
+}
+
+#navigation {
+	background-color: white;
+	margin: 16px 0px 32px 0px;
+	height: 40px;
+}
+
+#content {
+	background-color: white;
+	padding: 18px 10px 10px 10px;
+	margin: 3px 0px 20px 0px;
+		clear: both;
+		min-height: 108px;
+}
+
+#breadcrumbs {
+	margin-top: 20px;
+	font-size: 83%;
+	min-height: 3px;
+}
+
+#breadcrumbs a {
+	text-decoration: none;
+}
+
+#breadcrumbs li {
+	background-image: url("../images/Pfeil_rechts.png");
+	background-repeat: no-repeat;
+	background-position: -2px center;
+	float: left;
+	padding-left: 12px;
+	padding-right: 5px;
+}
+
+#footer {
+	font-size: 80%;
+}
+
+img#powered {
+	margin-top: -12px;
+	float: right;
+}
+
+img#book {
+vertical-align: middle;
+float:left;
+margin-right: 4px;
+}
+
+
+#pg_etikett_toppager, #pager_etikett {
+	font-size: 80%;
+}
