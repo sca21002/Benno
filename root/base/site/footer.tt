@@ -5,11 +5,11 @@
 
 <p id="name">
 	<img src="/static/images/Buch_25.png" id="book" alt="Benno Logo" title=""  />
-	Benno, letzte &Auml;nderung 20.07.11, &copy; Universit&auml;tsbibliothek Regensburg <br />
+	Benno, letzte &Auml;nderung 01.05.2012, &copy; Universit&auml;tsbibliothek Regensburg <br />
 	<a href="[% c.uri_for_action('/etikett/login') %]">Administrationsansicht</a>
 	 [% IF c.user_exists %]
        | Sie sind eingeloggt als [% c.user.id %]. 
-        <a href="[% c.uri_for_action('etikett/logout') %]">Logout</a>.
+        <a href="[% c.uri_for_action('/') %]">Logout</a>.
     [% END %]
 	</p>     
 	</div>                    

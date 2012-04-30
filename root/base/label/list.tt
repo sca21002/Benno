@@ -1,1 +1,78 @@
-Here we are!
+<script type="text/javascript">    
+
+$(document).ready(function() {
+jQuery("#etikett").jqGrid({
+    url:"[% json_url %]",
+    datatype: "json",
+    mtype: "POST",
+    colNames:['Signatur' , 'Datum'],
+    colModel:[
+        {name:'d11sig', sortable: true, width:250},
+        {name:'d11tag', sortable: true, width:120},
+       
+    ],
+    rowNum:25,
+    height: "100%",
+    width: "778",
+    rowList:[10,20,30,40,50,60,70,80,90,100],
+    pager: '#pager_etikett',
+    sortname: 'd11sig',
+    viewrecords: true,
+    sortorder: "asc",
+	multiselect : true,
+    caption:"Etiketten",
+    editurl: "[% c.uri_for_action('/etikett/ajax') %]"
+});
+jQuery("#etikett").jqGrid('navGrid','#pager_etikett',{edit:false,add:false,del:false});
+
+$('#print_selected').click(function() {
+	var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
+		window.open("[% c.uri_for_action('/etikett/ajax') %]?id="+gr+"&oper=print");
+
+	if( gr != null ) {
+		$.ajax({
+			url: "[% c.uri_for_action('/etikett/ajax') %]", 
+			data: {id: gr, oper: "print"}
+	});
+	}
+	else alert("Bitte eine Zeile auswählen!");
+
+	$('#etikett').trigger('reloadGrid');
+
+});
+
+
+
+$('#delete').click(function(){ 			  
+	var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow'); 
+	if( gr != null ) jQuery("#etikett").jqGrid('delGridRow',gr,{ }); 
+	else alert("Bitte eine Zeile auswählen!");
+
+	$('#etikett').trigger('reloadGrid');
+});
+
+});
+
+</script>   
+<style>
+#subnav {margin-top: -9px;}
+</style> 
+
+[% title = title; %]
+
+[%   
+   subnav = [
+{ url = c.uri_for_action('/etikett/print_fach', c.req.captures) title = 'Alle drucken' type='a' } 
+{ url = '' title = 'Ausgewählte drucken' type='a' id='print_selected' }
+{ title = 'Ausgewählte löschen' id='delete' type='input' } ]; 
+    
+    
+    breadcrumbs = [
+    { url = c.uri_for('/'),
+      title = 'Fachbereich auswählen'
+     }
+    ];
+ %]
+ <div class="ui-widget">       
+ <div><table id="etikett"></table></div><div id="pager_etikett"></div></div> 
+

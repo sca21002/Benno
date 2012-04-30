@@ -2,6 +2,8 @@ package Benno::Controller::Label;
 use Moose;
 use namespace::autoclean;
 
+use Data::Dumper;
+
 BEGIN {extends 'Catalyst::Controller'; }
 
 =head1 NAME
@@ -34,12 +36,75 @@ sub labels : Chained('/base') PathPart('etikett') CaptureArgs(0) {
 }
 
 sub labels_type : Chained('labels') PathPart('') CaptureArgs(1) {
-    my ( $self, $c ) = @_;    
+    my ( $self, $c, $type ) = @_;
+
+    my $label_rs = $c->stash->{labels};
+    $c->stash->{labels} = $label_rs->filter_type($type);
 }
+ 
 
 sub list : Chained('labels_type') PathPart('list') Args(0) {
     my ( $self, $c ) = @_;
+    
+    $c->stash(
+	json_url => $c->uri_for_action('label/json')
+    );
 }
+
+sub json : Chained('labels_type') PathPart('json') Args(0) {
+	my ( $self, $c ) = @_;
+
+	my $data = $c->req->params;
+	$c->log->debug( Dumper($data) );
+
+	my $page             = $data->{page} || 1;
+	my $entries_per_page = $data->{rows} || 25;
+	my $sidx             = $data->{sidx} || 'd11sig';
+	my $sord             = $data->{sord} || 'asc';
+
+	my $search =
+	     $data->{searchField}
+	  && $data->{searchString}
+	  ? { $data->{searchField} => $data->{searchString} }
+	  : {};
+	# $search->{gedruckt} = undef;
+	# $search->{typ}      = 'weiss';
+
+	my $label_rs = $c->stash->{labels};
+
+	$label_rs = $label_rs->search(
+		$search,
+		{
+			page     => $page,
+			rows     => $entries_per_page,
+			order_by => "$sidx $sord",
+		}
+	);
+
+	my $response;
+	$response->{page}    = $page;
+	$response->{total}   = $label_rs->pager->last_page;
+	$response->{records} = $label_rs->pager->total_entries;
+	my @rows;
+	while ( my $label = $label_rs->next ) {
+		my $row->{id} = $label->id;
+		$row->{cell} = [
+			$label->d11sig,
+			$label->d11tag->set_time_zone('Europe/Berlin')
+			  ->strftime('%d.%m.%Y'),
+			$label->d11zweig,
+			$label->d01entl,
+		];
+		push @rows, $row;
+	}
+	$response->{rows} = \@rows;
+
+	$c->stash( %$response, current_view => 'JSON' );
+}
+
+
+
+
 
 =head1 AUTHOR
 
