@@ -26,7 +26,7 @@ The root page (/)
 
 =cut
 
-sub base : Chained('/login/required') PathPart('') CaptureArgs(0) {}
+sub base : Chained('/') PathPart('') CaptureArgs(0) {}
  
 sub home : Chained('/base') PathPart('') Args(0) {
     my ($self, $c) = @_;

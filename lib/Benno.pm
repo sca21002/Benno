@@ -66,7 +66,7 @@ __PACKAGE__->config(
         },
     },
     'Controller::Login' => {
-        traits => ['-RenderAsTTTemplate'],
+        #traits => ['-RenderAsTTTemplate'],
         login_form_args => {
             authenticate_args => { active => 'Y' },
         },
