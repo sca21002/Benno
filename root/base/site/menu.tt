@@ -1,0 +1,61 @@
+
+<div id="breadcrumbs">
+ <ul id="breadcrumbs">
+ 
+ [%  FOREACH crumb IN breadcrumbs %]
+  <li><a href="[% crumb.url %]""> [% crumb.title %]</a></li>
+ [% END %]
+
+ <li>[% title or breadcrumbs.thispage %]</li>
+ 
+ [% IF path %]
+ <li>[% path %]</li>
+ [% END %]
+ </ul>
+</div>
+
+[% IF menu_links %]
+<div id="navigation">
+<ul id="navigation">
+[%  FOREACH page IN menu_links %]
+     <li class="[% page.state or 'default' %]"> 
+    
+     <a [% IF page.class %] class="[% page.class %]" [% END %]
+      [% IF page.id %] id="[% page.id %]" [% END %]
+     href="[% page.url %]">[% page.title %]</a>
+
+      
+
+     </li>
+     
+[%  END %]
+</ul>
+</div>
+[%  END %]
+
+[% IF subnav %]
+
+
+<div id="subnav">
+<ul id="subnav">
+[%  FOREACH link IN subnav %]
+     <li class="[% link.state or 'default' %]">
+      [% IF link.type == "a" %]
+      <a 
+     [% IF link.class %] class="[% link.class %]" [% END %]
+     [% IF link.id %] id="[% link.id %]" [% END %]
+     href="[% link.url %]">[% link.title %]</a></li>
+     [% END %]
+     
+     [% IF link.type == "input" %]
+     <input type="button"   
+     [% IF link.id %] id="[% link.id %]" [% END %]
+     value="[% link.title %]" />
+     [% END %]
+     
+[%  END %]
+
+</ul>
+</div>
+[%  END %]
+

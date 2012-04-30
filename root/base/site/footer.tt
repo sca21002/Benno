@@ -1,0 +1,19 @@
+<div id="footer">			
+
+<a href="http://www.catalystframework.org" target="_blank">
+<img id="powered" src="/static/images/btn_88x31_built.png"" alt="Powered by Catalyst" title="Powered by Catalyst"  /></a>
+
+<p id="name">
+	<img src="/static/images/Buch_25.png" id="book" alt="Benno Logo" title=""  />
+	Benno, letzte &Auml;nderung 20.07.11, &copy; Universit&auml;tsbibliothek Regensburg <br />
+	<a href="[% c.uri_for_action('/etikett/login') %]">Administrationsansicht</a>
+	 [% IF c.user_exists %]
+       | Sie sind eingeloggt als [% c.user.id %]. 
+        <a href="[% c.uri_for_action('etikett/logout') %]">Logout</a>.
+    [% END %]
+	</p>     
+	</div>                    
+</div>
+</div>
+</body>
+</html>

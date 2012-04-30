@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<script type="text/javascript" src="[%c.uri_for('/static/js/ext/jquery/jquery-1.5.1.min.js')%]"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="[% c.uri_for('/static/css/ui-lightness/jquery-ui-1.8.9.custom.css') %]" />
+    <link rel="stylesheet" type="text/css" media="screen" href="[% c.uri_for('/static/css/jqGrid/ui.jqgrid.css') %]" />
+    <script type="text/javascript" src="[% c.uri_for('/static/js/ext/plugins/jquery/jqGrid/i18n/grid.locale-de.js') %]"></script> 
+    <script type="text/javascript" src="[% c.uri_for('/static/js/ext/plugins/jquery/jqGrid/jquery.jqGrid.min.js') %]"></script> 
+    <script type="text/javascript" src="[% c.uri_for('/static/js/ext/jquery/jquery-ui-1.8.14.custom.min.js') %]"></script> 
+
+    <title>
+        [% title %]
+    </title>
+    <link title="main stylesheet" href="[%c.uri_for('/static/css/benno.css')%]" type="text/css" rel="stylesheet" />
+	
+</head>
+<body>
+
+    <div id="container">

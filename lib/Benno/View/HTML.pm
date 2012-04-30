@@ -6,7 +6,12 @@ extends 'Catalyst::View::TT';
 
 __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt',
+    INCLUDE_PATH => [
+        Benno->path_to( 'root', 'base' ),
+    ],
     render_die => 1,
+    ENCODING     => 'utf-8',
+    WRAPPER            => 'site/wrapper.tt',   
 );
 
 =head1 NAME
