@@ -189,6 +189,38 @@ __PACKAGE__->add_unique_constraint("d11sig", ["d11sig", "d11tag"]);
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Q1sl1sWdtnO4jl9rk8Q6bw
 
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+has 'label_groups' => (
+    is => 'ro',
+    isa => 'ArrayRef',
+    builder => '_build_label_groups',
+);
+
+sub _build_label_groups {
+    [
+        alle => {
+            name => 'Alle',
+            search => '{}',
+        },
+        rw => {
+            name => 'Wirtschaft & Recht',
+            search => { d11sig =>  { '>=' => '30/', '<' => '50/' }  }
+        },
+        pt => {
+            name => 'PT',
+            search => {
+                d11sig => [
+                    { '>=' => '50/', '<' => '80/' }, 
+                    {'-like', '180/%'}
+                ]
+            },
+        },
+        med => {
+            name => 'Medizin',
+            search => { d11sig => { '>=' => '91/', '<' => '9999/' } },
+        },               
+    
+    ];  
+}
+                
 __PACKAGE__->meta->make_immutable;
 1;

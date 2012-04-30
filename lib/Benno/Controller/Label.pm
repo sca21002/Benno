@@ -36,11 +36,11 @@ sub labels : Chained('/base') PathPart('etikett') CaptureArgs(0) {
 }
 
 sub labels_type : Chained('labels') PathPart('') CaptureArgs(1) {
-    my ( $self, $c, $type ) = @_;
+    my ( $self, $c, $label_group ) = @_;
 
     $type |= 'alle';
     my $label_rs = $c->stash->{labels};
-    $c->stash->{labels} = $label_rs->filter_type($type);
+    $c->stash->{labels} = $label_rs->filter_label_group($label_group);
 }
  
 
