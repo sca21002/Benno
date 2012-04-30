@@ -32,12 +32,13 @@ sub index :Path :Args(0) {
 sub labels : Chained('/base') PathPart('etikett') CaptureArgs(0) {
     my ( $self, $c ) = @_;
 
-    $c->stash->{labels} = $c->model('BennoDB::Labels');
+    $c->stash->{labels} = $c->model('BennoDB::Label');
 }
 
 sub labels_type : Chained('labels') PathPart('') CaptureArgs(1) {
     my ( $self, $c, $type ) = @_;
 
+    $type |= 'alle';
     my $label_rs = $c->stash->{labels};
     $c->stash->{labels} = $label_rs->filter_type($type);
 }
@@ -50,6 +51,12 @@ sub list : Chained('labels_type') PathPart('list') Args(0) {
 	json_url => $c->uri_for_action('label/json')
     );
 }
+
+sub print :  Chained('labels_type') PathPart('print') Args(0) {
+    my ( $self, $c ) = @_;
+
+}
+
 
 sub json : Chained('labels_type') PathPart('json') Args(0) {
 	my ( $self, $c ) = @_;
@@ -102,7 +109,21 @@ sub json : Chained('labels_type') PathPart('json') Args(0) {
 	$c->stash( %$response, current_view => 'JSON' );
 }
 
+sub ajax : Chained('labels') {
+	my ( $self, $c ) = @_;
+	my $data = $c->req->params;
+	$c->log->debug( Dumper($data) );
 
+	my $oper = $data->{oper};
+
+	#if ( $oper eq "del" ) {
+	#	$c->forward('delete');
+	#}
+
+	#if ( $oper eq "print" ) {
+	#	$c->forward('print_selected');
+	#}
+}
 
 
 

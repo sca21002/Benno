@@ -12,3 +12,5 @@ sub filter_type {
 
 }
 
+1;
+
