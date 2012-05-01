@@ -148,6 +148,17 @@ sub delete : Private {
     $c->stash( %$response, current_view => 'JSON' );
 }
 
+sub print_selected : Private {
+	my ( $self, $c ) = @_;
+
+	my $label_rs = $c->stash->{labels};
+	my $data       = $c->req->params;
+        my $id         = $data->{id} || 11222;
+        my @label_ids = split( /,/, $id );
+        $c->stash->{labels} = $label_rs->search({id => \@label_ids});
+        $c->forward('print');
+}
+
 sub print : Private {
     my ($self, $c) = @_;
     
