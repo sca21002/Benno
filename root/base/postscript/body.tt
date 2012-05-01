@@ -1,0 +1,3 @@
+[%- FOREACH etikett IN etiketten -%]
+[%- PROCESS postscript/page.tt -%] 
+[%- END -%]

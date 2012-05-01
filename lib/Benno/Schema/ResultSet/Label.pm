@@ -11,7 +11,7 @@ sub filter_label_group {
     
     my $labelgroup = $self->result_source->schema->resultset('Labelgroup')->find($labelgroup_id);
     return unless $labelgroup;
-    return $self->search($labelgroup->search);
+    return $self->search({%{$labelgroup->search}, printed => undef });
 
 }
 

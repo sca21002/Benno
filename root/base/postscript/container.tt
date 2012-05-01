@@ -1,0 +1,11 @@
+=for layout widget
+
+[% field_list  %]
+%%Page: sig 1
+outputArray Etikett
+
+=for layout field
+
+[% call_next %]
+
+=cut

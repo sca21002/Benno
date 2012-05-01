@@ -1,10 +1,14 @@
 package Benno::Controller::Label;
 use Moose;
 use namespace::autoclean;
-
+use Benno::UI::ViewPort::Field::Signatur;
+use DateTime;
 use Data::Dumper;
 
 BEGIN {extends 'Catalyst::Controller'; }
+
+has label_type =>
+  ( is => 'rw', isa => 'Str', required => 1, default => sub { 'weiss' } );
 
 =head1 NAME
 
@@ -137,10 +141,10 @@ sub delete : Private {
     my $now = DateTime->now( time_zone => 'Europe/Berlin' );
     
     foreach my $label_id (@label_ids) {
-        $label = $c->model('BennoDB::label')->find($label_id);
+        my $label = $c->model('BennoDB::label')->find($label_id);
         $label->update( { deleted => $now } );
     }
-    my $response->{rows} = scalar @ids;
+    my $response->{rows} = scalar @label_ids;
     $c->stash( %$response, current_view => 'JSON' );
 }
 
@@ -156,27 +160,26 @@ sub print : Private {
     while ( my $label = $label_rs->next ) {
 	push @$labels, Benno::UI::ViewPort::Field::Signatur->new(
 	    signatur_str => $label->d11sig, );
-	}
-	my $today =
-	  DateTime->now( time_zone => 'Europe/Berlin' )->strftime('%y%m%d');
-	my $filename = join( '_', 'sig', $self->label_type, $today ) . '.ps';
-	$c->stash(
-		current_view => 'PostScript',
-		template     => 'postscript/print.tt',
-		etiketten    => $labels,
-		etikett_typ  => 'WeissesEtikett',
-	);
-	if ( $c->forward('Benno::View::PostScript') ) {
-		$c->response->content_type('application/postscript');
-		$c->response->header( 'Content-Disposition',
-			"attachment; filename=$filename" );
-	}
-	my $now = DateTime->now( time_zone => 'Europe/Berlin' );
-	$label_rs->reset;
-	while ( my $label = $label_rs->next ) {
-	    $label->update( { printed => $now } );
-	}
-    }    
+    }
+    my $today =
+        DateTime->now( time_zone => 'Europe/Berlin' )->strftime('%y%m%d');
+    my $filename = join( '_', 'sig', $self->label_type, $today ) . '.ps';
+    $c->stash(
+        current_view => 'PostScript',
+	template     => 'postscript/print.tt',
+	etiketten    => $labels,
+	etikett_typ  => 'WeissesEtikett',
+    );
+    if ( $c->forward('Benno::View::PostScript') ) {
+        $c->response->content_type('application/postscript');
+	$c->response->header( 'Content-Disposition',
+		"attachment; filename=$filename" );
+    }
+    my $now = DateTime->now( time_zone => 'Europe/Berlin' );
+    $label_rs->reset;
+    while ( my $label = $label_rs->next ) {
+        $label->update( { printed => $now } );
+    }
 }
 
 

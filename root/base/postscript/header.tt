@@ -1,0 +1,101 @@
+%!PS-Adobe-3.0
+%%Title: (SignaturenDruck)
+%%For: (Christa Kastenmeier)
+%%Pages: [% etiketten.size %]
+%%PageOrder: Ascend
+%%EndComments
+%%EndProlog
+
+%%BeginSetUp
+2 dict dup /PageSize [230 75] put
+setpagedevice
+
+/QuerFlag 0 def
+/RotesEtikett 
+{% A4-Seite: Bild wird um 90 Grad gedreht
+220 10 translate    % nur für Solo 80
+0 0 moveto           % immer zum Ursprung des aktuellen Koord.systems
+90 rotate
+ /XKoord 100 def  % Start X-Kordinate
+} bind def
+
+/WeissesEtikett  
+{% A4-Seite: Bild wird um 90 Grad gedreht
+8 70 translate      % nur für Solo 51
+0 0 moveto           % immer zum Ursprung des aktuellen Koord.systems
+270 rotate
+ /XKoord 100 def  % Start X-Kordinate
+} bind def
+
+/Quer
+{% für Dissertationen
+16 70 translate      % nur die 2. Zeile quer
+0 0 moveto           % immer zum Ursprung des aktuellen Koord.systems
+ /XKoord 23 def  % Start X-Kordinate
+ 270 rotate
+} bind def
+
+
+/EineSignatur {
+ /Linecnt -1 def  % Schleifenzähler
+ /step 22 def   % Zeilenabstand
+
+/Umlaute           % die nächsten 6 Zeilen einfügen um Umlaute und ß drucken zu können
+{
+dup length dict begin   
+{def} forall
+/Encoding ISOLatin1Encoding def
+currentdict
+end
+/Helvetica-ISOLatin1 exch definefont 
+} bind def
+
+%Zeile 1 in Schriftgröße 26 dargestellt
+/Helvetica-Bold findfont
+Umlaute
+26 scalefont setfont
+
+
+%% ausgabe aller zeilen der signatur
+
+{ % loop
+   XKoord 0 lt {exit} if
+  % ausgabe holen
+  /Linecnt Linecnt 1 add def
+  /signatur outputArray Linecnt get def
+  
+  30 XKoord  moveto
+  % zentriert ausgeben
+  signatur dup stringwidth pop 2 div neg 0 rmoveto show
+  
+  Linecnt 0 eq {/Helvetica-Bold findfont % ab Zeile 2 Schriftgröße 23
+                Umlaute
+               23 scalefont setfont
+     		   } if 
+			  
+  Linecnt 1 eq {/Helvetica-Bold findfont % ab Zeile 3 Schriftgröße 15
+	            Umlaute
+                13 scalefont setfont
+                /XKoord 80 def 
+                /step 16 def  % Zeilenabstand verkleinern
+			    QuerFlag 1 eq { Quer /QuerFlag 0 def} if 
+			   } if
+			  
+ Linecnt 1 gt { /step 14 def } if
+ 
+  /XKoord XKoord step sub def	  
+ } loop
+ showpage
+ } bind def
+
+ 
+  /Etikett
+ {
+ [% etikett_typ %] % Solo51Etikett oder Solo80Etikett
+ EineSignatur
+ } bind def
+
+
+ /outputArray 9 array def
+%%EndSetUp
+

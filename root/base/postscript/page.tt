@@ -1,0 +1,6 @@
+%%BeginPageSetup
+%%Page: sig[% loop.count %] [% loop.count %]
+[% PROCESS postscript/signatur.tt %]
+outputArray Etikett
+%%EndPageSetUp
+

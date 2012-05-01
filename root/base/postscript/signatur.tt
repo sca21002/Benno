@@ -1,0 +1,6 @@
+/outputArray [
+[%- FOREACH signatur_part IN etikett.sig_arrayref -%] 
+([% signatur_part.value %])
+[%- END -%]
+] def
+/QuerFlag [% etikett.is_quer ? 1 : 0 %] def
