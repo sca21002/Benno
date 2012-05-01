@@ -7,11 +7,11 @@ use Data::Dumper;
 use base qw(DBIx::Class::ResultSet);
 
 sub filter_label_group {
-    my ($self, $label_group) = @_;
+    my ($self, $labelgroup_id) = @_;
     
-    warn 'LABEL_GROUPS ' . Dumper($self->result_source->label_groups);
-        
-    return $self->search({});
+    my $labelgroup = $self->result_source->schema->resultset('Labelgroup')->find($labelgroup_id);
+    return unless $labelgroup;
+    return $self->search($labelgroup->search);
 
 }
 

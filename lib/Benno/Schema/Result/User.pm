@@ -144,30 +144,23 @@ __PACKAGE__->set_primary_key("id");
 
 __PACKAGE__->add_unique_constraint("email_address", ["email_address"]);
 
+=head2 C<username>
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-04-29 16:30:39
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lX/7z62oFWHkLhq746t8UQ
+=over 4
+
+=item * L</username>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("username", ["username"]);
 
 
-__PACKAGE__->add_columns(
-    '+password' => {
-        passphrase       => 'rfc2307',
-        passphrase_class => 'BlowfishCrypt',
-        passphrase_args  => {
-            cost        => 8,
-            salt_random => 20,
-        },
-        passphrase_check_method => 'check_password',
-    }
-);
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-01 11:43:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:MtLsrZEpZjFqBBz1YjQU1A
 
-__PACKAGE__->has_many(
-    "user_roles",
-    "Benno::Schema::Result::UserRole",
-    { "foreign.user_id" => "self.id" }
-);  
 
-__PACKAGE__->many_to_many("roles", "user_roles", "role");
-
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;

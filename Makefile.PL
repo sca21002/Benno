@@ -24,6 +24,7 @@ requires 'Catalyst::Plugin::Session::State::Cookie';
 requires 'Catalyst::Plugin::Authorization::Roles';
 requires 'DBIx::Class::PassphraseColumn';
 requires 'Authen::Passphrase::BlowfishCrypt';
+requires 'Config::ZOMG';
 
 test_requires 'Test::More' => '0.88';
 catalyst;

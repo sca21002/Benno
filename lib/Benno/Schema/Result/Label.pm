@@ -30,11 +30,11 @@ extends 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime");
 
-=head1 TABLE: C<label>
+=head1 TABLE: C<labels>
 
 =cut
 
-__PACKAGE__->table("label");
+__PACKAGE__->table("labels");
 
 =head1 ACCESSORS
 
@@ -185,42 +185,10 @@ __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint("d11sig", ["d11sig", "d11tag"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-04-28 16:04:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Q1sl1sWdtnO4jl9rk8Q6bw
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-01 11:43:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oX43c/CzihQgvcpMwn4E6w
 
 
-has 'label_groups' => (
-    is => 'ro',
-    isa => 'ArrayRef',
-    builder => '_build_label_groups',
-);
-
-sub _build_label_groups {
-    [
-        alle => {
-            name => 'Alle',
-            search => '{}',
-        },
-        rw => {
-            name => 'Wirtschaft & Recht',
-            search => { d11sig =>  { '>=' => '30/', '<' => '50/' }  }
-        },
-        pt => {
-            name => 'PT',
-            search => {
-                d11sig => [
-                    { '>=' => '50/', '<' => '80/' }, 
-                    {'-like', '180/%'}
-                ]
-            },
-        },
-        med => {
-            name => 'Medizin',
-            search => { d11sig => { '>=' => '91/', '<' => '9999/' } },
-        },               
-    
-    ];  
-}
-                
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;

@@ -20,6 +20,7 @@ use Catalyst qw/
     -Debug
     ConfigLoader
     Static::Simple
+    Unicode::Encoding
     Session
     Session::Store::File
     Session::State::Cookie

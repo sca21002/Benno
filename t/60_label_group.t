@@ -20,7 +20,9 @@ my $schema_atacama = Benno::Schema->connect(
     @{$config_hash->{'Model::BennoDB'}{connect_info}}  
 );
 
+my $rs = $schema_atacama->resultset('Label')->filter_label_group('rw');
 
+diag 'Anzahl: ' . $rs->count;
 
                                                       
 

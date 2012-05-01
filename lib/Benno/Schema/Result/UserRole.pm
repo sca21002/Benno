@@ -30,11 +30,11 @@ extends 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime");
 
-=head1 TABLE: C<user_role>
+=head1 TABLE: C<users_roles>
 
 =cut
 
-__PACKAGE__->table("user_role");
+__PACKAGE__->table("users_roles");
 
 =head1 ACCESSORS
 
@@ -74,15 +74,10 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key("user_id", "role_id");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-04-28 16:04:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v0CGdi/Pdz2MDI9Brs73gQ
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-01 11:43:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:nAsX8q8x9K9IS8+dpo/D+g
 
 
-__PACKAGE__->belongs_to(
-    "role",
-    "Benno::Schema::Result::Role",
-    { "foreign.role_id" => "self.id" }
-);
-
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;

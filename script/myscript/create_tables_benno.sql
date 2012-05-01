@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `label`;
-CREATE TABLE `label` (
+DROP TABLE IF EXISTS labels;
+CREATE TABLE `labels` (
     `id` INTEGER unsigned NOT NULL auto_increment,
     `d11sig` varchar(40) collate utf8_unicode_ci NOT NULL default '',
     `d11mcopyno` int(11) default NULL,
@@ -14,20 +14,19 @@ CREATE TABLE `label` (
     `deleted` datetime default NULL,
     PRIMARY KEY  (`id`),
     UNIQUE KEY `d11sig` (`d11sig`,`d11tag`)
-) ENGINE=MyISAM AUTO_INCREMENT=262143 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE  IF EXISTS users;
 CREATE TABLE users (
     id            INTEGER unsigned NOT NULL auto_increment,
-    username      VARCHAR(255),
+    username      VARCHAR(255) UNIQUE,
     password      VARCHAR(255),
     password_expires TIMESTAMP,
-    email_address VARCHAR(255),
+    email_address VARCHAR(255) UNIQUE,
     first_name    VARCHAR(255),
     last_name     VARCHAR(255),
     active        INTEGER,
-    PRIMARY KEY (id),
-    UNIQUE (email_address)
+    PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
 DROP TABLE IF EXISTS printers;
@@ -39,17 +38,24 @@ CREATE TABLE printers (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
-DROP TABLE IF EXISTS role;
-CREATE TABLE role (
+DROP TABLE IF EXISTS roles;
+CREATE TABLE roles (
     id   INTEGER unsigned NOT NULL auto_increment,
     role VARCHAR(255),
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
-DROP TABLE IF EXISTS user_role;
-CREATE TABLE user_role (
+DROP TABLE IF EXISTS users_roles;
+CREATE TABLE users_roles (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     role_id INTEGER REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (user_id, role_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
+DROP TABLE IF EXISTS labelgroups;
+CREATE TABLE labelgroups (
+   id VARCHAR(50),
+   name VARCHAR(255) UNIQUE,
+   search TEXT,
+   PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
