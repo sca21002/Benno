@@ -57,9 +57,9 @@ sub list : Chained('labels_type') PathPart('list') Args(0) {
     );
 }
 
-sub print :  Chained('labels_type') PathPart('print') Args(0) {
+sub print_label_type :  Chained('labels_type') PathPart('print') Args(0) {
     my ( $self, $c ) = @_;
-
+    $c->forward('print');
 }
 
 
@@ -115,21 +115,69 @@ sub json : Chained('labels_type') PathPart('json') Args(0) {
 }
 
 sub ajax : Chained('labels') {
-	my ( $self, $c ) = @_;
-	my $data = $c->req->params;
-	$c->log->debug( Dumper($data) );
+    my ( $self, $c ) = @_;
 
-	my $oper = $data->{oper};
+    my $data = $c->req->params;
+    $c->log->debug( Dumper($data) );
 
-	#if ( $oper eq "del" ) {
-	#	$c->forward('delete');
-	#}
+    my $oper = $data->{oper};
 
-	#if ( $oper eq "print" ) {
-	#	$c->forward('print_selected');
-	#}
+    if ( $oper eq "del" ) { $c->forward('delete') }
+    if ( $oper eq "print" ) { $c->forward('print_selected') }
 }
 
+sub delete : Private {
+    my ( $self, $c ) = @_;
+    
+    my $data = $c->req->params;
+    my $id   = $data->{id};
+    my $oper = $data->{oper};
+    
+    my @label_ids     = split( /,/, $id );
+    my $now = DateTime->now( time_zone => 'Europe/Berlin' );
+    
+    foreach my $label_id (@label_ids) {
+        $label = $c->model('BennoDB::label')->find($label_id);
+        $label->update( { deleted => $now } );
+    }
+    my $response->{rows} = scalar @ids;
+    $c->stash( %$response, current_view => 'JSON' );
+}
+
+sub print : Private {
+    my ($self, $c) = @_;
+    
+    my $label_rs = $c->stash->{labels};
+    $label_rs = $label_rs->search(
+	undef,
+    	{ order_by => 'd11sig' }
+    );
+    my $labels;
+    while ( my $label = $label_rs->next ) {
+	push @$labels, Benno::UI::ViewPort::Field::Signatur->new(
+	    signatur_str => $label->d11sig, );
+	}
+	my $today =
+	  DateTime->now( time_zone => 'Europe/Berlin' )->strftime('%y%m%d');
+	my $filename = join( '_', 'sig', $self->label_type, $today ) . '.ps';
+	$c->stash(
+		current_view => 'PostScript',
+		template     => 'postscript/print.tt',
+		etiketten    => $labels,
+		etikett_typ  => 'WeissesEtikett',
+	);
+	if ( $c->forward('Benno::View::PostScript') ) {
+		$c->response->content_type('application/postscript');
+		$c->response->header( 'Content-Disposition',
+			"attachment; filename=$filename" );
+	}
+	my $now = DateTime->now( time_zone => 'Europe/Berlin' );
+	$label_rs->reset;
+	while ( my $label = $label_rs->next ) {
+	    $label->update( { printed => $now } );
+	}
+    }    
+}
 
 
 =head1 AUTHOR
