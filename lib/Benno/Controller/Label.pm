@@ -2,6 +2,7 @@ package Benno::Controller::Label;
 use Moose;
 use namespace::autoclean;
 use Benno::UI::ViewPort::Field::Signatur;
+use Benno::Form::Label;
 use DateTime;
 use Data::Dumper;
 
@@ -37,6 +38,15 @@ sub labels : Chained('/base') PathPart('etikett') CaptureArgs(0) {
     my ( $self, $c ) = @_;
 
     $c->stash->{labels} = $c->model('BennoDB::Label');
+}
+
+
+sub label : Chained('labels') PathPart('') CaptureArgs(1) {
+	my ( $self, $c, $id ) = @_;
+
+	my $label = $c->stash->{label} = $c->stash->{labels}->find($id)
+	  || $c->detach('not_found');
+
 }
 
 sub labels_type : Chained('labels') PathPart('') CaptureArgs(1) {
@@ -117,6 +127,44 @@ sub json : Chained('labels_type') PathPart('json') Args(0) {
 
 	$c->stash( %$response, current_view => 'JSON' );
 }
+
+sub edit : Chained('label') {
+	my ( $self, $c ) = @_;
+	$c->forward('save');
+}
+
+sub add : Chained('labels') {
+	my ( $self, $c ) = @_;
+	$c->forward('save');
+}
+
+# both adding and editing happens here
+# no need to duplicate functionality
+sub save : Private {
+	my ( $self, $c ) = @_;
+
+	my $label = $c->stash->{label}
+            || $c->model('BennoDB::Label')->new_result({
+                    d11tag => 
+                        DateTime->now(
+                            locale      => 'de_DE',
+                            time_zone   => 'Europe/Berlin',
+                        ),
+               });                                                              
+                                                         
+                                                         
+           
+ 
+	my $form = Benno::Form::Label->new;
+	$c->stash( template => 'label/edit.tt', form => $form );
+	$form->process( item => $label, params => $c->req->params );
+	return unless $form->validated;
+
+	#$c->flash( message => 'Book created' );
+	# Redirect the user back to the list page
+	$c->response->redirect( $c->uri_for_action('label/list') );
+}
+
 
 sub ajax : Chained('labels') {
     my ( $self, $c ) = @_;
