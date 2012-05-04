@@ -24,11 +24,13 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
+=item * L<DBIx::Class::PassphraseColumn>
+
 =back
 
 =cut
 
-__PACKAGE__->load_components("InflateColumn::DateTime");
+__PACKAGE__->load_components("InflateColumn::DateTime", "PassphraseColumn");
 
 =head1 TABLE: C<users>
 
@@ -157,10 +159,29 @@ __PACKAGE__->add_unique_constraint("email_address", ["email_address"]);
 __PACKAGE__->add_unique_constraint("username", ["username"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-01 11:43:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:MtLsrZEpZjFqBBz1YjQU1A
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-03 17:52:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9nVBiIuXRyUB4WKJ1SdQkA
 
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+__PACKAGE__->add_columns(
+    '+password' => {
+        passphrase       => 'rfc2307',
+        passphrase_class => 'BlowfishCrypt',
+        passphrase_args  => {
+            cost        => 8,
+            salt_random => 20,
+        },
+        passphrase_check_method => 'check_password',
+    }
+);
+
+__PACKAGE__->has_many(
+    "users_roles",
+    "Benno::Schema::Result::UserRole",
+    { "foreign.user_id" => "self.id" }
+);
+
+__PACKAGE__->many_to_many("roles", "users_roles", "role");
+
 __PACKAGE__->meta->make_immutable;
 1;

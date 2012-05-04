@@ -41,7 +41,7 @@ CREATE TABLE printers (
 DROP TABLE IF EXISTS roles;
 CREATE TABLE roles (
     id   INTEGER unsigned NOT NULL auto_increment,
-    role VARCHAR(255),
+    name VARCHAR(255),
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 

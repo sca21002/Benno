@@ -24,11 +24,13 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
+=item * L<DBIx::Class::PassphraseColumn>
+
 =back
 
 =cut
 
-__PACKAGE__->load_components("InflateColumn::DateTime");
+__PACKAGE__->load_components("InflateColumn::DateTime", "PassphraseColumn");
 
 =head1 TABLE: C<labelgroups>
 
@@ -94,8 +96,8 @@ __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-01 11:43:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BkXheeBDwW7BMU3697NbjA
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-03 17:52:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:hKfSJaJQgTVvLI/Qa6NIrQ
 
 
 use JSON;

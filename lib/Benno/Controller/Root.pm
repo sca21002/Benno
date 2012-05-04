@@ -31,7 +31,7 @@ sub base : Chained('/') PathPart('') CaptureArgs(0) {}
 sub home : Chained('/base') PathPart('') Args(0) {
     my ($self, $c) = @_;
  
-    $c->res->redirect($c->uri_for('/label/list'));
+    $c->res->redirect($c->uri_for_action('/label/list',['alle']));
 }
  
 

@@ -24,11 +24,13 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
+=item * L<DBIx::Class::PassphraseColumn>
+
 =back
 
 =cut
 
-__PACKAGE__->load_components("InflateColumn::DateTime");
+__PACKAGE__->load_components("InflateColumn::DateTime", "PassphraseColumn");
 
 =head1 TABLE: C<labels>
 
@@ -185,8 +187,8 @@ __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint("d11sig", ["d11sig", "d11tag"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-01 11:43:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oX43c/CzihQgvcpMwn4E6w
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-03 17:52:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0+yQ/3BOIi/EarSwlQx5lQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

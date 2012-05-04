@@ -24,11 +24,13 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
+=item * L<DBIx::Class::PassphraseColumn>
+
 =back
 
 =cut
 
-__PACKAGE__->load_components("InflateColumn::DateTime");
+__PACKAGE__->load_components("InflateColumn::DateTime", "PassphraseColumn");
 
 =head1 TABLE: C<roles>
 
@@ -45,11 +47,11 @@ __PACKAGE__->table("roles");
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 role
+=head2 name
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 255
+  size: 250
 
 =cut
 
@@ -61,8 +63,8 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "role",
-  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "name",
+  { data_type => "varchar", is_nullable => 1, size => 250 },
 );
 
 =head1 PRIMARY KEY
@@ -78,8 +80,8 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key("id");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-01 11:43:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:71El+p7CcoWkGkpCCr8VoA
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-03 17:52:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4DZdf3UcmPWzcUPaBf/2Jw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

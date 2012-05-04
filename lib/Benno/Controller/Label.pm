@@ -6,7 +6,7 @@ use Benno::Form::Label;
 use DateTime;
 use Data::Dumper;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'Catalyst::Controller::ActionRole'; }
 
 has label_type =>
   ( is => 'rw', isa => 'Str', required => 1, default => sub { 'weiss' } );
@@ -24,16 +24,6 @@ Catalyst Controller.
 =cut
 
 
-=head2 index
-
-=cut
-
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->response->body('Matched Benno::Controller::Label in Label.');
-}
-
 sub labels : Chained('/base') PathPart('etikett') CaptureArgs(0) {
     my ( $self, $c ) = @_;
 
@@ -50,6 +40,7 @@ sub label : Chained('labels') PathPart('') CaptureArgs(1) {
 }
 
 sub labels_type : Chained('labels') PathPart('') CaptureArgs(1) {
+
     my ( $self, $c, $labelgroup_id ) = @_;
 
     $labelgroup_id ||= 'alle';
@@ -71,8 +62,9 @@ sub list : Chained('labels_type') PathPart('list') Args(0) {
     );
 }
 
-sub print_label_type :  Chained('labels_type') PathPart('print') Args(0) {
+sub print_label_type :  Chained('labels_type') PathPart('print') Args(0) Does(ACL) RequiresRole(admin) ACLDetachTo(denied) {
     my ( $self, $c ) = @_;
+    
     $c->forward('print');
 }
 
@@ -241,6 +233,13 @@ sub print : Private {
     }
 }
 
+
+sub denied : Private {
+    my ($self, $c) = @_;
+ 
+    $c->res->redirect($c->uri_for($self->action_for('list'), ['alle'],
+        {status_msg => "Access Denied"}));
+}
 
 =head1 AUTHOR
 

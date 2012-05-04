@@ -14,6 +14,22 @@ a,a:link {
 	color: #605E5D;
 }
 
+input[type="submit"] {
+  margin: 15px 0;
+
+}
+
+input[type="text"] {
+  
+}
+
+
+
+label {
+  display: inline-block;
+  min-width: 7em;
+}
+
 a:visited {
 	text-decoration: underline;
 }
@@ -111,45 +127,6 @@ ul#navigation li {
 }
 
 
-ul#fachbereiche {
-	    margin-left: -11px;
-	    margin-right: -23px;
-	    margin-top: -19px;
-    
-}
-ul#fachbereiche li {
-	background-color: powderblue;
-    border-left: 2px solid #E4F3F6;
-    float: left;
-    height: 138px;    
-    width: 159px;
-}
-
-ul#fachbereiche li a {
-    display: block;
-    text-align: center;
-    vertical-align: middle;
-    padding: 49px 10px;
-}
-
-ul#fachbereiche li a:HOVER, ul#navigation li a:HOVER {
-	color: white;
-}
-
-ul#fachbereiche li:FIRST-CHILD {
-	border-left: 0px;
-}
-
-ul#fachbereiche li:HOVER {
-	background-color: cadetblue;
-}
-
-ul#navigation li:HOVER {
-	background-color: cadetblue; 
-	height: 20px;
-	color: white !important;
-}
-
 li.active {
 	background-image: url("../images/pfeil.png");
 	background-position: 48% 39px;
@@ -192,7 +169,7 @@ li.active {
 }
 
 #footer {
-	font-size: 80%;
+	font-size: 70%;
 }
 
 img#powered {
@@ -210,3 +187,5 @@ margin-right: 4px;
 #pg_etikett_toppager, #pager_etikett {
 	font-size: 80%;
 }
+
+

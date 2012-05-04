@@ -59,7 +59,7 @@ __PACKAGE__->config(
                 },
                 store => {
                     class         => 'DBIx::Class',
-                    user_model    => 'DB::User',
+                    user_model    => 'BennoDB::User',
                     role_relation => 'roles',
                     role_field    => 'name',
                 }
@@ -68,8 +68,10 @@ __PACKAGE__->config(
     },
     'Controller::Login' => {
         #traits => ['-RenderAsTTTemplate'],
-        login_form_args => {
-            authenticate_args => { active => 'Y' },
+           login_form_args => {
+               authenticate_username_field_name => 'username',
+               authenticate_password_field_name => 'password',
+               authenticate_args => { active => 'Y' },
         },
     },
 );
