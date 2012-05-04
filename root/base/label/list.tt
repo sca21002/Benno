@@ -63,16 +63,17 @@ $('#delete').click(function(){
 [% title = title; %]
 
 [% IF c.check_user_roles('admin') %]
-BITTE DRUCKFUNKTIONEN AUSBLENDEN!
+[% subnav = [
+  { url = c.uri_for_action('/label/print_label_type', c.req.captures) title = 'Alle drucken' type='a' } ,
+  { url = '' title = 'Ausgewählte drucken' type='a' id='print_selected' }]; 
+%]
+%]
+[% ELSE %]
+[% subnav = [{ title = 'Ausgewählte löschen' id='delete' type='input' } ]; %]
 [% END %]
 
 [%   
-   subnav = [
-{ url = c.uri_for_action('/label/print_label_type', c.req.captures) title = 'Alle drucken' type='a' } 
-{ url = '' title = 'Ausgewählte drucken' type='a' id='print_selected' }
-{ title = 'Ausgewählte löschen' id='delete' type='input' } ]; 
-    
-    
+
     breadcrumbs = [
     { url = c.uri_for('/'),
       title = 'Fachbereich auswählen'
