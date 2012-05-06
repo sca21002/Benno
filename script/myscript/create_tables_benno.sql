@@ -54,8 +54,27 @@ CREATE TABLE users_roles (
 
 DROP TABLE IF EXISTS labelgroups;
 CREATE TABLE labelgroups (
-   id VARCHAR(50),
+   id INTEGER unsigned NOT NULL auto_increment,
+   shortname VARCHAR(50) UNIQUE,
    name VARCHAR(255) UNIQUE,
    search TEXT,
    PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
+DROP TABLE IF EXISTS clients;
+CREATE TABLE clients (
+    id            INTEGER unsigned NOT NULL auto_increment,
+    address       VARCHAR(255) UNIQUE,
+    hostname      VARCHAR(255) UNIQUE,
+    room          VARCHAR(255),  
+    active        INTEGER,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
+DROP TABLE IF EXISTS clients_roles;
+CREATE TABLE clients_roles (
+    client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    role_id INTEGER REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (client_id, role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+

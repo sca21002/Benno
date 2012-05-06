@@ -18,13 +18,21 @@ requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
 requires 'CatalystX::SimpleLogin';
+requires 'Catalyst::Plugin::Authentication';
+requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::Plugin::Session';
 requires 'Catalyst::Plugin::Session::Store::File';
 requires 'Catalyst::Plugin::Session::State::Cookie';
 requires 'Catalyst::Plugin::Authorization::Roles';
+requires 'Catalyst::Plugin::Unicode::Encoding';
+requires 'Catalyst::View::JSON';
 requires 'DBIx::Class::PassphraseColumn';
 requires 'Authen::Passphrase::BlowfishCrypt';
 requires 'Config::ZOMG';
+requires 'HTML::FormHandler::Model::DBIC';
+requires 'MooseX::NonMoose';
+requires 'MooseX::MarkAsMethods';
+requires 'List::Util';
 
 test_requires 'Test::More' => '0.88';
 catalyst;

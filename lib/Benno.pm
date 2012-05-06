@@ -1,6 +1,7 @@
 package Benno;
 use Moose;
 use namespace::autoclean;
+use Data::Dumper;
 
 use Catalyst::Runtime 5.80;
 

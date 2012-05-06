@@ -1,6 +1,7 @@
 package Benno::Controller::Root;
 use Moose;
 use namespace::autoclean;
+use List::Util qw(first);
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -26,13 +27,21 @@ The root page (/)
 
 =cut
 
-sub base : Chained('/') PathPart('') CaptureArgs(0) {}
- 
-sub home : Chained('/base') PathPart('') Args(0) {
+sub base : Chained('/') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
- 
-    $c->res->redirect($c->uri_for_action('/label/list',['alle']));
+
+    my @roles = ( $c->model('BennoDB::Client')->roles($c->req->address) );
+    push @roles, $c->user->roles if $c->user;  
+    
+    $c->stash(
+        roles       => [ @roles ],
+        labelgroups => [ $c->model('BennoDB::Labelgroup')->search({})->all ],
+        can_print      => first { 'admin'|'print' } @roles,
+    );    
+
 }
+ 
+sub index : Chained('/base') PathPart('') Args {}
  
 
 =head2 default
@@ -41,7 +50,7 @@ Standard 404 error page
 
 =cut
 
-sub default : Chained('/base') PathPart('') Args {
+sub not_found : Private {
     my ($self, $c) = @_;
     $c->res->body('Page not found');
     $c->res->status(404);

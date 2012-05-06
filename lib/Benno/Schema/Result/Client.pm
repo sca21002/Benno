@@ -1,12 +1,12 @@
 use utf8;
-package Benno::Schema::Result::Labelgroup;
+package Benno::Schema::Result::Client;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-Benno::Schema::Result::Labelgroup
+Benno::Schema::Result::Client
 
 =cut
 
@@ -32,11 +32,11 @@ extends 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime", "PassphraseColumn");
 
-=head1 TABLE: C<labelgroups>
+=head1 TABLE: C<clients>
 
 =cut
 
-__PACKAGE__->table("labelgroups");
+__PACKAGE__->table("clients");
 
 =head1 ACCESSORS
 
@@ -47,21 +47,27 @@ __PACKAGE__->table("labelgroups");
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 shortname
-
-  data_type: 'varchar'
-  is_nullable: 1
-  size: 50
-
-=head2 name
+=head2 address
 
   data_type: 'varchar'
   is_nullable: 1
   size: 255
 
-=head2 search
+=head2 hostname
 
-  data_type: 'text'
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
+=head2 room
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
+=head2 active
+
+  data_type: 'integer'
   is_nullable: 1
 
 =cut
@@ -74,12 +80,14 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "shortname",
-  { data_type => "varchar", is_nullable => 1, size => 50 },
-  "name",
+  "address",
   { data_type => "varchar", is_nullable => 1, size => 255 },
-  "search",
-  { data_type => "text", is_nullable => 1 },
+  "hostname",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "room",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "active",
+  { data_type => "integer", is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -96,41 +104,42 @@ __PACKAGE__->set_primary_key("id");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<name>
+=head2 C<address>
 
 =over 4
 
-=item * L</name>
+=item * L</address>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint("name", ["name"]);
+__PACKAGE__->add_unique_constraint("address", ["address"]);
 
-=head2 C<shortname>
+=head2 C<hostname>
 
 =over 4
 
-=item * L</shortname>
+=item * L</hostname>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint("shortname", ["shortname"]);
+__PACKAGE__->add_unique_constraint("hostname", ["hostname"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07023 @ 2012-05-06 14:17:33
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cDwCkBEZcVGWGcG2iMnfXQ
+# Created by DBIx::Class::Schema::Loader v0.07023 @ 2012-05-05 16:18:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:irt5Pm27RZn5h3l75zz+IA
 
 
-use JSON;
+__PACKAGE__->has_many(
+    "clients_roles",
+    "Benno::Schema::Result::ClientRole",
+    { "foreign.client_id" => "self.id" }
+);
 
-__PACKAGE__->inflate_column('search', {
-    inflate => sub { decode_json shift },
-    deflate => sub { encode_json shift },
-});
+__PACKAGE__->many_to_many("roles", "clients_roles", "role");
 
 __PACKAGE__->meta->make_immutable;
 1;

@@ -1,17 +1,8 @@
 
 <div id="breadcrumbs">
  <ul id="breadcrumbs">
- 
- [%  FOREACH crumb IN breadcrumbs %]
-  <li><a href="[% crumb.url %]""> [% crumb.title %]</a></li>
- [% END %]
-
- <li>[% title or breadcrumbs.thispage %]</li>
- 
- [% IF path %]
- <li>[% path %]</li>
- [% END %]
- </ul>
+ <li><a href="[% c.uri_for_action('/index')%]">Zur Übersicht</a></li>
+</ul>
 </div>
 
 [% IF menu_links %]

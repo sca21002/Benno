@@ -4,7 +4,9 @@ use namespace::autoclean;
 use Benno::UI::ViewPort::Field::Signatur;
 use Benno::Form::Label;
 use DateTime;
+use JSON;
 use Data::Dumper;
+
 
 BEGIN {extends 'Catalyst::Controller::ActionRole'; }
 
@@ -35,25 +37,28 @@ sub label : Chained('labels') PathPart('') CaptureArgs(1) {
 	my ( $self, $c, $id ) = @_;
 
 	my $label = $c->stash->{label} = $c->stash->{labels}->find($id)
-	  || $c->detach('not_found');
+	  || $c->detach('/not_found');
 
 }
 
-sub labels_type : Chained('labels') PathPart('') CaptureArgs(1) {
+sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
 
-    my ( $self, $c, $labelgroup_id ) = @_;
+    my ( $self, $c, $labelgroup ) = @_;
 
-    $labelgroup_id ||= 'alle';
-    $c->log->debug('labelgroup_id: ' . $labelgroup_id);
-    my $label_rs = $c->stash->{labels};
-    $label_rs  = $label_rs->filter_label_group($labelgroup_id);
+    $labelgroup ||= 'alle';
+    $c->log->debug('labelgroup: ' . $labelgroup);
+    my $label_rs = $c->stash->{labels}->search({
+        printed => undef,
+        deleted => undef,        
+    });
+    $label_rs  = $label_rs->filter_labelgroup($labelgroup);
     $c->detach('/default') unless $label_rs;
     $c->log->debug('label_rs (count): ' .  $label_rs->count); 
     $c->stash->{labels} =  $label_rs;
 }
  
 
-sub list : Chained('labels_type') PathPart('list') Args(0) {
+sub list : Chained('labelgroup') PathPart('list') Args(0) {
     my ( $self, $c ) = @_;
     
     $c->log->debug('URI for action: ' . $c->uri_for_action('/label/json',  $c->req->captures));
@@ -62,14 +67,38 @@ sub list : Chained('labels_type') PathPart('list') Args(0) {
     );
 }
 
-sub print_label_type :  Chained('labels_type') PathPart('print') Args(0) Does(ACL) RequiresRole(admin) ACLDetachTo(denied) {
+sub list_admin : Chained('/login/required') PathPart('list_admin') Args(0)
+          :  Does(MyACL)
+          :  RequiresRole(admin)
+          :  ACLDetachTo(/login/login) {
     my ( $self, $c ) = @_;
-    
-    $c->forward('print');
+        
+    my @roles = ( $c->model('BennoDB::Client')->roles($c->req->address) );
+    push @roles, $c->user->roles if $c->user;      
+        
+    $c->stash(
+        roles       => [ @roles ],
+        labelgroups => [ $c->model('BennoDB::Labelgroup')->search({})->all ],
+        labels      => $c->model('BennoDB::Label'),
+        json_url    => $c->uri_for_action('label/json_admin'),
+    );
 }
 
 
-sub json : Chained('labels_type') PathPart('json') Args(0) {
+
+sub print :  Chained('labelgroup') PathPart('print') Args(0)
+          :  Does(MyACL)
+          :  AllowedRole(print)
+          :  AllowedRole(admin)
+          :  ACLDetachTo(denied)
+{
+    my ( $self, $c ) = @_;
+    
+    $self->print_do($c);
+}
+
+
+sub json : Chained('labelgroup') PathPart('json') Args(0) {
 	my ( $self, $c ) = @_;
 
 	my $data = $c->req->params;
@@ -80,18 +109,10 @@ sub json : Chained('labels_type') PathPart('json') Args(0) {
 	my $sidx             = $data->{sidx} || 'd11sig';
 	my $sord             = $data->{sord} || 'asc';
 
-	my $search =
-	     $data->{searchField}
-	  && $data->{searchString}
-	  ? { $data->{searchField} => $data->{searchString} }
-	  : {};
-	# $search->{gedruckt} = undef;
-	# $search->{typ}      = 'weiss';
-
 	my $label_rs = $c->stash->{labels};
 
 	$label_rs = $label_rs->search(
-		$search,
+		{},
 		{
 			page     => $page,
 			rows     => $entries_per_page,
@@ -120,19 +141,94 @@ sub json : Chained('labels_type') PathPart('json') Args(0) {
 	$c->stash( %$response, current_view => 'JSON' );
 }
 
+sub json_admin : Chained('labels') PathPart('json_admin') Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $data = $c->req->params;
+    $c->log->debug( Dumper($data) );
+
+    my $page             = $data->{page} || 1;
+    my $entries_per_page = $data->{rows} || 45;
+    my $sidx             = $data->{sidx} || 'd11sig';
+    my $sord             = $data->{sord} || 'asc';
+
+    my $filters = $data->{filters};
+    $c->log->debug( Dumper($filters) );
+    #$filters = decode_json $filters if $filters;  #ging nicht mit utf8??    
+    $filters = from_json $filters if $filters;   
+
+    my $label_rs = $c->stash->{labels};
+   
+    my ($search, $labelgroup);
+    
+    foreach my $rule ( @{ $filters->{rules} } ) {
+        my $field = $rule->{field};
+        my $data = $rule->{data};
+        if ($field eq 'type') {
+            $labelgroup = $data;
+        } else {
+            $search->{"me.$field"} = { like => "%$data%" };
+        }    
+    }
+    
+    if ($labelgroup) {
+        $label_rs = $label_rs->filter_labelgroup($labelgroup);    
+    }
+    
+    $label_rs = $label_rs->search(
+        $search,
+        {
+            page => $page,
+            rows => $entries_per_page,
+            order_by => "$sidx $sord",
+            }
+    );
+    
+   # $c->log->debug( Dumper(@and_cond) );
+   
+	my $response;
+	$response->{page}    = $page;
+	$response->{total}   = $label_rs->pager->last_page;
+	$response->{records} = $label_rs->pager->total_entries;
+	my @rows;
+	while ( my $label = $label_rs->next ) {
+		my $row->{id} = $label->id;
+		
+		$row->{cell} = [
+			$label->d11sig,
+			$label->d11tag->set_time_zone('Europe/Berlin')
+			  ->strftime('%d.%m.%Y'),
+			$label->type,
+			$label->printed
+                            && $label->printed->set_time_zone('Europe/Berlin')
+			    ->strftime('%d.%m.%Y') || '',
+                        $label->deleted
+                            && $label->deleted->set_time_zone('Europe/Berlin')
+			    ->strftime('%d.%m.%Y') || '',
+		];
+		push @rows, $row;
+	}
+	$response->{rows} = \@rows;
+
+	$c->stash( %$response, current_view => 'JSON' );
+}
+
+
+
+
 sub edit : Chained('label') {
 	my ( $self, $c ) = @_;
-	$c->forward('save');
+	$self->save($c);
 }
 
 sub add : Chained('labels') {
 	my ( $self, $c ) = @_;
-	$c->forward('save');
+	$self->save($c);
 }
 
 # both adding and editing happens here
 # no need to duplicate functionality
-sub save : Private {
+sub save  {
 	my ( $self, $c ) = @_;
 
 	my $label = $c->stash->{label}
@@ -143,17 +239,12 @@ sub save : Private {
                             time_zone   => 'Europe/Berlin',
                         ),
                });                                                              
-                                                         
-                                                         
-           
  
 	my $form = Benno::Form::Label->new;
 	$c->stash( template => 'label/edit.tt', form => $form );
 	$form->process( item => $label, params => $c->req->params );
 	return unless $form->validated;
 
-	#$c->flash( message => 'Book created' );
-	# Redirect the user back to the list page
 	$c->response->redirect( $c->uri_for_action('label/list') );
 }
 
@@ -166,11 +257,11 @@ sub ajax : Chained('labels') {
 
     my $oper = $data->{oper};
 
-    if ( $oper eq "del" ) { $c->forward('delete') }
-    if ( $oper eq "print" ) { $c->forward('print_selected') }
+    if ( $oper eq "del" ) { $self->delete($c) }
+    if ( $oper eq "print" ) { $self->print_selected($c) }
 }
 
-sub delete : Private {
+sub delete  {
     my ( $self, $c ) = @_;
     
     my $data = $c->req->params;
@@ -188,7 +279,13 @@ sub delete : Private {
     $c->stash( %$response, current_view => 'JSON' );
 }
 
-sub print_selected : Private {
+# Should be merged with sub print 
+sub print_selected  : Chained('labels')
+                    :  Does(MyACL)
+                    :  AllowedRole(print)
+                    :  AllowedRole(admin)
+                    :  ACLDetachTo(denied) {
+
 	my ( $self, $c ) = @_;
 
 	my $label_rs = $c->stash->{labels};
@@ -196,10 +293,10 @@ sub print_selected : Private {
         my $id         = $data->{id} || 11222;
         my @label_ids = split( /,/, $id );
         $c->stash->{labels} = $label_rs->search({id => \@label_ids});
-        $c->forward('print');
+        $self->print_do($c);
 }
 
-sub print : Private {
+sub print_do {
     my ($self, $c) = @_;
     
     my $label_rs = $c->stash->{labels};
@@ -237,7 +334,7 @@ sub print : Private {
 sub denied : Private {
     my ($self, $c) = @_;
  
-    $c->res->redirect($c->uri_for($self->action_for('list'), ['alle'],
+    $c->res->redirect($c->uri_for($self->action_for('/index'),
         {status_msg => "Access Denied"}));
 }
 

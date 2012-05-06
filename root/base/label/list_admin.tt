@@ -1,0 +1,175 @@
+[% path = title; %]
+<script type="text/javascript">
+
+jQuery(function($){
+    $.datepicker.regional['de'] = {clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
+            closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
+            prevText: '&#x3c;zurück', prevStatus: 'letzten Monat zeigen',
+            nextText: 'Vor&#x3e;', nextStatus: 'nächsten Monat zeigen',
+            currentText: 'heute', currentStatus: '',
+            monthNames: ['Januar','Februar','März','April','Mai','Juni',
+            'Juli','August','September','Oktober','November','Dezember'],
+            monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
+            'Jul','Aug','Sep','Okt','Nov','Dez'],
+            monthStatus: 'anderen Monat anzeigen', yearStatus: 'anderes Jahr anzeigen',
+            weekHeader: 'Wo', weekStatus: 'Woche des Monats',
+            dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+            dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+            dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+            dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'Wähle D, M d',
+            dateFormat: 'dd.mm.yy', firstDay: 1, 
+            initStatus: 'Wähle ein Datum', isRTL: false};
+    $.datepicker.setDefaults($.datepicker.regional['de']);
+});
+
+datePick = function(elem)
+{
+   jQuery(elem).datepicker( { 
+	   dateFormat: 'yy-mm-dd',
+	   onSelect: function(dateText, inst) { 	
+		   var sgrid = $("#etikett")[0];
+		   sgrid.triggerToolbar();
+	    } } )	;
+}
+$(document).ready(function() {
+		jQuery("#etikett").jqGrid( {
+			url : "[% json_url %]",
+			datatype : "json",
+			colNames : [ 'Signatur', 'Vom', 'Typ', 'Gedruckt am', 'Gelöscht am'],
+			colModel : [ {
+				name : 'd11sig',
+				sortable : true,
+				width : 250,
+				editable: true,
+				editoptions:{size:50}
+			}, {
+				name : 'd11tag',
+				sortable : true,
+				editable: false,
+				width : 120,
+				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
+			}, {
+				name : 'type',
+				sortable : true,
+				editable: true,
+				width : 100,
+				stype : 'select',
+				editoptions : {
+					value : "[% FOR labelgroup IN labelgroups %][% labelgroup.shortname %]:[% labelgroup.name %][%- ";" UNLESS loop.last -%][% END %]"
+				}
+			}, 
+			 {
+				name : 'printed',
+				sortable : true,
+				editable: true,
+				width : 140,
+				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
+			},
+			{
+				name : 'deleted',
+				sortable : true,
+				editable: true,
+				width : 140,
+				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
+			},                        
+                        
+                        
+                        ],
+			rowNum : 25,
+			height : "100%",
+			width : "778",
+			rowList : [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+			pager : '#pager_etikett',
+			sortname : 'd11tag',
+			viewrecords : true,
+			sortorder : "desc",
+			multiselect : true,
+			toppager: true,
+			caption : "Etiketten",
+			editurl: "[% c.uri_for_action('/label/ajax') %]"
+		});
+		
+		jQuery("#etikett").jqGrid('navGrid', '#pager_etikett', {
+			edit : true,
+			add : true,
+			del : false		});
+
+
+		jQuery("#etikett").jqGrid('navButtonAdd','#pager_etikett',
+				{caption:"Filter zurücksetzen", onClickButton:function()
+			{ var grid = $("#etikett");
+			grid[0].clearToolbar();
+			} }); 
+
+
+		jQuery("#etikett").jqGrid('navButtonAdd','#etikett_toppager',
+				{caption:"Filter zurücksetzen", onClickButton:function()
+			{ var grid = $("#etikett");
+			grid[0].clearToolbar();
+			} }); 
+
+		$("ul#navigation li a").each(function(n) {
+			if (this.id == "[% path %]") {
+				$(this).parent().attr("class", "active");
+			}
+		    if ("[% path %]" == "list") {
+				$("ul#navigation li:first-child").attr("class", "active");
+
+				
+			}
+		});
+
+	
+		
+		$('#print_selected').click(function() {
+			var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
+ 			window.open("[% c.uri_for_action('/label/ajax') %]?id="+gr+"&oper=print", "_self");
+ 		
+			if( gr != null ) {
+				$.ajax({
+					url: "[% c.uri_for_action('/label/ajax') %]", 
+					data: {id: gr, oper: "print"}
+				});
+			}
+			else alert("Bitte eine Zeile auswählen!");
+			$('#etikett').trigger('reloadGrid');
+
+		});
+
+
+		$('#etikett').jqGrid('filterToolbar',  {
+			stringResult : true,
+			searchOnEnter : true
+		});
+
+
+	
+		$('#delete').click(function(){ 			  
+			var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow'); 
+			if( gr != null ) jQuery("#etikett").jqGrid('delGridRow',gr,{ }); 
+			else alert("Bitte eine Zeile auswählen!");
+
+			$('#etikett').trigger('reloadGrid');
+		});
+	});
+</script>
+<style>
+#subnav {margin-top: -9px;}
+</style> 
+
+
+[% title = "Administrationsansicht"; subnav = [
+## FIX ME!
+# { url = c.uri_for('/etikett/weiss/rw/print') title = 'Alle drucken' type='a' }
+{ title = 'Ausgewählte drucken' type='input'
+id='print_selected' } { title = 'Ausgewählte löschen' id='delete'
+type='input' } ]; %]
+
+
+
+<div class="ui-widget">
+<div>
+<table id="etikett"></table>
+</div>
+<div id="pager_etikett"></div>
+</div>
