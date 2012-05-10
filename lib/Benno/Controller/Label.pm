@@ -297,27 +297,27 @@ sub print_selected  : Chained('labels')
         $self->print_do($c);
 }
 
-sub edit_selected  : Chained('labels')
-                    :  Does(MyACL)
-                    :  AllowedRole(print)
-                    :  AllowedRole(admin)
-                    :  ACLDetachTo(denied) {
-
-    my ( $self, $c ) = @_;
-    my $label_rs = $c->stash->{labels};
-    my @columns = $label_rs->result_source->columns;
-    my @primary_columns = $label_rs->result_source->primary_columns;
-    my %is_primary_column = map { $_,1 } @primary_columns;
-    my @non_primary_columns = grep { ! $is_primary_column{$_} } @columns;
-    my %is_non_primary_column = map { $_,1 } @non_primary_columns;
-    While (my ($k, $v) = %{$c->req->params}) {
-        $data->{$k} = $v || undef if $is_non_primary_column{$k};  
-    }
-    $c->log->debug(Data::Dumper::Dumper($data));
-    
-    
-    
-    
+#sub edit_selected  : Chained('labels')
+#                    :  Does(MyACL)
+#                    :  AllowedRole(print)
+#                    :  AllowedRole(admin)
+#                    :  ACLDetachTo(denied) {
+#
+#    my ( $self, $c ) = @_;
+#    my $label_rs = $c->stash->{labels};
+#    my @columns = $label_rs->result_source->columns;
+#    my @primary_columns = $label_rs->result_source->primary_columns;
+#    my %is_primary_column = map { $_,1 } @primary_columns;
+#    my @non_primary_columns = grep { ! $is_primary_column{$_} } @columns;
+#    my %is_non_primary_column = map { $_,1 } @non_primary_columns;
+#    While (my ($k, $v) = %{$c->req->params}) {
+#        $data->{$k} = $v || undef if $is_non_primary_column{$k};  
+#    }
+#    $c->log->debug(Data::Dumper::Dumper($data));
+#    
+#    
+#    
+#    
     #
     #my $data       = $c->req->params;
     #my $id         = $data->{id} || 11222;
@@ -330,7 +330,7 @@ sub edit_selected  : Chained('labels')
     #    {status_msg => "Access Denied"}));
     #
     
-}
+#}
 
 sub print_do {
     my ($self, $c) = @_;
