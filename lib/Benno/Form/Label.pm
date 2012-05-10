@@ -17,12 +17,12 @@ has_field 'd11tag' => (
     format => "%d.%m.%Y",
 );
 
-has_field 'typ' => (
-    type => 'Text',
-    label => 'Typ',
-);
+#has_field 'type' => (
+#    type => 'Text',
+#    label => 'Typ',
+#);
 
-has_field 'typ' => ( type => 'Select', 
+has_field 'type' => ( type => 'Select', 
     options => [
         { value => 'weiss', label => 'weiß'},
         { value => 'rot', label => 'rot'},

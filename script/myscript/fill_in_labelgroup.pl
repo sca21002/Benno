@@ -58,11 +58,10 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
             shortname => 'zb_weiss',
             name => 'ZB weiß',
             search => {
-                d11sig => [
-                    { '<' => '30/'},
-                    { '>' => '80/'},
-                    { '-not_like' => => '180/%'},
-                ],
+                d11sig => {
+                    '-or' => {'<' => '30/', '>' => '80/'},
+                    '-not_like' => '180/%',
+                },
                 type   => 'weiss',
             },
         },

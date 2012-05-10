@@ -257,8 +257,9 @@ sub ajax : Chained('labels') {
 
     my $oper = $data->{oper};
 
-    if ( $oper eq "del" ) { $self->delete($c) }
-    if ( $oper eq "print" ) { $self->print_selected($c) }
+    if ( $oper eq 'del' )   { $self->delete($c) }
+    if ( $oper eq 'print' ) { $c->forward('print_selected') }
+    if ( $oper eq 'edit' )  { $c->forward('edit_selected') } 
 }
 
 sub delete  {
@@ -294,6 +295,41 @@ sub print_selected  : Chained('labels')
         my @label_ids = split( /,/, $id );
         $c->stash->{labels} = $label_rs->search({id => \@label_ids});
         $self->print_do($c);
+}
+
+sub edit_selected  : Chained('labels')
+                    :  Does(MyACL)
+                    :  AllowedRole(print)
+                    :  AllowedRole(admin)
+                    :  ACLDetachTo(denied) {
+
+    my ( $self, $c ) = @_;
+    my $label_rs = $c->stash->{labels};
+    my @columns = $label_rs->result_source->columns;
+    my @primary_columns = $label_rs->result_source->primary_columns;
+    my %is_primary_column = map { $_,1 } @primary_columns;
+    my @non_primary_columns = grep { ! $is_primary_column{$_} } @columns;
+    my %is_non_primary_column = map { $_,1 } @non_primary_columns;
+    While (my ($k, $v) = %{$c->req->params}) {
+        $data->{$k} = $v || undef if $is_non_primary_column{$k};  
+    }
+    $c->log->debug(Data::Dumper::Dumper($data));
+    
+    
+    
+    
+    #
+    #my $data       = $c->req->params;
+    #my $id         = $data->{id} || 11222;
+    #delete $data->{oper};
+    #delete $data->{deleted} if $data->{deleted} eq '';
+    #delete $data->{printed} if $data->{printed} eq '';
+    #my $row = $label_rs->find($data->{id});
+    #$row->update({type => $data->{type}});
+    #$c->res->redirect($c->uri_for($self->action_for('list_admin'),
+    #    {status_msg => "Access Denied"}));
+    #
+    
 }
 
 sub print_do {
