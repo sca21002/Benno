@@ -1,10 +1,12 @@
- <table>
- [% IF roles.grep('admin').size > 0 %]
- <td><a href="[% c.uri_for_action('/label/list_admin')%]">Administrationsansicht</a></td>
- [% END %] 
+<ul id="list">
+
  [%- FOR labelgroup IN labelgroups %]
- <tr>
- <td><a href="[% c.uri_for_action('/label/list', [ labelgroup.shortname ])%]">[%labelgroup.name%]</a></td>
- </tr>
+<li><a href="[% c.uri_for_action('/label/list', [ labelgroup.shortname ])%]">[%labelgroup.name%]</a></li>
+
  [% END %]
- </table>
+ 
+</ul>
+
+
+
+[% location = "start"; %]

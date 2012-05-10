@@ -1,52 +1,38 @@
 
-<div id="breadcrumbs">
- <ul id="breadcrumbs">
- <li><a href="[% c.uri_for_action('/index')%]">Zur Übersicht</a></li>
-</ul>
-</div>
-
-[% IF menu_links %]
-<div id="navigation">
-<ul id="navigation">
-[%  FOREACH page IN menu_links %]
-     <li class="[% page.state or 'default' %]"> 
+<div id="breadcrumbs_container">
+  <ul id="breadcrumbs">
+  
     
-     <a [% IF page.class %] class="[% page.class %]" [% END %]
-      [% IF page.id %] id="[% page.id %]" [% END %]
-     href="[% page.url %]">[% page.title %]</a>
+    [% IF location == "start"  %]
+    <li><a  class="active" name="ui-icon-home" href="[% c.uri_for_action('/index')%]">Übersicht</a> </li>
+    <li><a name="ui-icon-pencil" href="[% c.uri_for_action('/label/add')%]">Signaturen eingeben</a></li>
 
+    [% ELSE %]
+    <li><a name="ui-icon-arrowreturnthick-1-w" href="[% c.uri_for_action('/index')%]">Zur Übersicht</a></li>
+    [%  END %]
+    
+    
       
-
-     </li>
-     
-[%  END %]
-</ul>
+     [% IF roles.grep('admin').size > 0 %]
+ <li><a name="ui-icon-locked" href="[% c.uri_for_action('/label/list_admin')%]">Administration</a></li>
+ [% END %] 
+ 
+    
+  </ul>
 </div>
-[%  END %]
-
-[% IF subnav %]
 
 
-<div id="subnav">
-<ul id="subnav">
-[%  FOREACH link IN subnav %]
-     <li class="[% link.state or 'default' %]">
-      [% IF link.type == "a" %]
-      <a 
-     [% IF link.class %] class="[% link.class %]" [% END %]
-     [% IF link.id %] id="[% link.id %]" [% END %]
-     href="[% link.url %]">[% link.title %]</a></li>
-     [% END %]
-     
-     [% IF link.type == "input" %]
-     <input type="button"   
-     [% IF link.id %] id="[% link.id %]" [% END %]
-     value="[% link.title %]" />
-     [% END %]
-     
-[%  END %]
+<script type="text/javascript">
+        
+  $(function() {
+    $( "ul#breadcrumbs a, ul#subnav a" ).button(); 
+  
+  
+    $( "ul#breadcrumbs a, ul#subnav a" ).each (function() {
+      $(this).button( "option", "icons", 
+      {primary:$( $(this)).attr("name")} );
+    });
 
-</ul>
-</div>
-[%  END %]
-
+        
+  });
+</script>

@@ -51,7 +51,7 @@ __PACKAGE__->table("roles");
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 250
+  size: 255
 
 =cut
 
@@ -64,7 +64,7 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "name",
-  { data_type => "varchar", is_nullable => 1, size => 250 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
 );
 
 =head1 PRIMARY KEY
@@ -80,8 +80,8 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key("id");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-03 17:52:01
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4DZdf3UcmPWzcUPaBf/2Jw
+# Created by DBIx::Class::Schema::Loader v0.07022 @ 2012-05-07 09:42:41
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XM13ZqayMyJheUsgm6bz0A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

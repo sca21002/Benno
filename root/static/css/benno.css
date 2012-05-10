@@ -23,6 +23,16 @@ input[type="text"] {
   
 }
 
+.message {
+  color: darkgreen;
+  font-weight: bold;
+  
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+}
 
 
 label {
@@ -62,84 +72,55 @@ a:active {
 	margin: 4px auto 0;
 }
 
-ul#navigation li a,ul#fachbereiche li a {
-	text-decoration: none;
-	font-size: 17px;
-}
-
-
-ul#navigation li a {
-	padding: 8px 7px;
-
-}
 
 ul#navigation,ul#breadcrumbs,ul#subnav,ul#fachbereiche {
 	list-style-type: none;
 	padding-left: 0;
 }
 
-ul#subnav li {
-	border-left: 2px solid #e4f3f6;
-	float: left;
-	padding: 4px 8px;
-	background-color: white;
-	margin-bottom: -1px;
-}
 
-ul#subnav li:FIRST-CHILD {
-	border-left: 0px;
-}
-
-ul#subnav li:HOVER, ul#subnav li a:HOVER, ul#subnav li input:HOVER {
-	background-color: cadetblue;
-	color: white !important;
-}
 
 ul#subnav {
 	float: right;
-	margin-bottom: 0px;	
+  font-size: 12px;
+	margin: -45px -11px 0 0;
+}
+
+ul#subnav li {
+  float: left;
+}
+
+ul#list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul#list li {
+  margin: 5px;
 }
 
 
-#subnav {	
-	font-size: 96%;
+img {
+  border: 0 none;
 }
 
-ul#subnav li a, ul#subnav li input {
-	text-decoration: none;	
-	height: 100%;
-	width: 100%;
-}
-
-ul#subnav li input {
- background-color: white;
- border: none;
- margin-top: -2px;
  
+li a.ui-state-default {
+  border-bottom: 0 none;
+  border-top: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  
 }
 
-
-
-ul#navigation li {
-	float: left;
-	padding: 10px 40px;
-	border-right: 1px solid #E4F3F6;
+li a.active {
+ border-bottom: 0 none;
+  border-top: 1px solid #eb8f00;
+  border-left: 1px solid #eb8f00;
+  border-right: 1px solid #eb8f00;
 }
 
-
-li.active {
-	background-image: url("../images/pfeil.png");
-	background-position: 48% 39px;
-	background-repeat: no-repeat;
-	height: 45px;
-	overflow: visible;
-}
-
-#navigation {
-	background-color: white;
-	margin: 16px 0px 32px 0px;
-	height: 40px;
-}
 
 #content {
 	background-color: white;
@@ -149,23 +130,15 @@ li.active {
 		min-height: 108px;
 }
 
-#breadcrumbs {
+#breadcrumbs_container {
 	margin-top: 20px;
-	font-size: 83%;
+	font-size: 12px;
 	min-height: 3px;
 }
 
-#breadcrumbs a {
-	text-decoration: none;
-}
-
-#breadcrumbs li {
-	background-image: url("../images/Pfeil_rechts.png");
-	background-repeat: no-repeat;
-	background-position: -2px center;
+ul#breadcrumbs li {
 	float: left;
-	padding-left: 12px;
-	padding-right: 5px;
+
 }
 
 #footer {

@@ -72,7 +72,7 @@ __PACKAGE__->config(
            login_form_args => {
                authenticate_username_field_name => 'username',
                authenticate_password_field_name => 'password',
-               authenticate_args => { active => 'Y' },
+        #       authenticate_args => { active => 'Y' },
         },
     },
 );

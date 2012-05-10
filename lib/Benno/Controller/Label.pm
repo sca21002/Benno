@@ -245,7 +245,7 @@ sub save  {
 	$form->process( item => $label, params => $c->req->params );
 	return unless $form->validated;
 
-	$c->response->redirect( $c->uri_for_action('label/list') );
+         $c->stash(status_msg =>  'Signatur ' . $label->d11sig . ' gespeichert');
 }
 
 
