@@ -67,7 +67,7 @@ sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
     $label_rs  = $label_rs->filter_labelgroup($labelgroup->shortname);
     $c->detach('/default') unless $label_rs;
     $c->log->debug('label_rs (count): ' .  $label_rs->count); 
-    $c->stash(labels => $label_rs, labelgroup => $labelgroup);
+    $c->stash(labels => $label_rs, labelgroup_name => $labelgroup->name);
 }
  
 
