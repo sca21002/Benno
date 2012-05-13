@@ -9,6 +9,7 @@
 
     [% ELSE %]
     <li><a name="ui-icon-arrowreturnthick-1-w" href="[% c.uri_for_action('/index')%]">Zur Übersicht</a></li>
+    <li>[% labelgroup.name %]</li>
     [%  END %]
     
     

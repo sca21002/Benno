@@ -5,6 +5,7 @@ use Benno::UI::ViewPort::Field::Signatur;
 use Benno::Form::Label;
 use DateTime;
 use JSON;
+use List::Util qw(first);
 use Data::Dumper;
 
 
@@ -36,25 +37,37 @@ sub labels : Chained('/base') PathPart('etikett') CaptureArgs(0) {
 sub label : Chained('labels') PathPart('') CaptureArgs(1) {
 	my ( $self, $c, $id ) = @_;
 
-	my $label = $c->stash->{label} = $c->stash->{labels}->find($id)
-	  || $c->detach('/not_found');
+	my $label = $c->stash->{label} = $c->stash->{labels}->find($id);
+        unless ($label) {
+        $c->stash(
+            error_msg => "Signatur mit ID $id nicht gefunden!"
+        );
+        $c->detach('/base');
+    }
 
 }
 
 sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
-
-    my ( $self, $c, $labelgroup ) = @_;
-
-    $labelgroup ||= 'alle';
-    $c->log->debug('labelgroup: ' . $labelgroup);
+    my ( $self, $c, $labelgroup_shortname ) = @_;
+   
+    my $labelgroups = $c->stash->{labelgroups};
+    $c->log->debug('labelgroup: ' . $labelgroup_shortname);
+    my $labelgroup
+        = first {$_->shortname eq $labelgroup_shortname} @$labelgroups;
+    unless ($labelgroup) {
+        $c->stash(
+            error_msg => "Signaturgruppe $labelgroup_shortname nicht gefunden!"
+        );
+        $c->detach('/base');
+    }
     my $label_rs = $c->stash->{labels}->search({
         printed => undef,
         deleted => undef,        
     });
-    $label_rs  = $label_rs->filter_labelgroup($labelgroup);
+    $label_rs  = $label_rs->filter_labelgroup($labelgroup->shortname);
     $c->detach('/default') unless $label_rs;
     $c->log->debug('label_rs (count): ' .  $label_rs->count); 
-    $c->stash->{labels} =  $label_rs;
+    $c->stash(labels => $label_rs, labelgroup => $labelgroup);
 }
  
 
@@ -229,23 +242,28 @@ sub add : Chained('labels') {
 # both adding and editing happens here
 # no need to duplicate functionality
 sub save  {
-	my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-	my $label = $c->stash->{label}
-            || $c->model('BennoDB::Label')->new_result({
-                    d11tag => 
-                        DateTime->now(
-                            locale      => 'de_DE',
-                            time_zone   => 'Europe/Berlin',
-                        ),
-               });                                                              
- 
-	my $form = Benno::Form::Label->new;
-	$c->stash( template => 'label/edit.tt', form => $form );
-	$form->process( item => $label, params => $c->req->params );
-	return unless $form->validated;
-
-         $c->stash(status_msg =>  'Signatur ' . $label->d11sig . ' gespeichert');
+    my $label = $c->stash->{label}
+        || $c->model('BennoDB::Label')->new_result({
+                d11tag => 
+                    DateTime->now(
+                        locale      => 'de_DE',
+                        time_zone   => 'Europe/Berlin',
+                    ),
+            });                                                              
+    $c->log->debug(Data::Dumper::Dumper($c->req->params));
+    my $form = Benno::Form::Label->new;
+    $c->stash( template => 'label/edit.tt', form => $form );
+    $form->process( item => $label, params => $c->req->params );
+    if ($form->validated) {
+        $c->stash(status_msg => 'Signatur ' . $label->d11sig . ' gespeichert.');
+        $label = $c->model('BennoDB::Label')->new_result({
+                d11tag => $label->d11tag,
+                type   => $label->type,
+        });
+        $form->process( item => $label);
+    }    
 }
 
 

@@ -33,10 +33,13 @@ sub base : Chained('/') PathPart('') CaptureArgs(0) {
     my @roles = ( $c->model('BennoDB::Client')->roles($c->req->address) );
     push @roles, $c->user->roles if $c->user;  
     
+    my $search = first { 'admin' } @roles
+        ? {} : {shortname => {'!=' => 'alle'}} ;
+    
     $c->stash(
         roles       => [ @roles ],
-        labelgroups => [ $c->model('BennoDB::Labelgroup')->search({})->all ],
-        can_print      => first { 'admin'|'print' } @roles,
+        labelgroups => [$c->model('BennoDB::Labelgroup')->search($search)->all],
+        can_print   => first { 'admin'|'print' } @roles,
     );    
 
 }
@@ -44,18 +47,6 @@ sub base : Chained('/') PathPart('') CaptureArgs(0) {
 sub index : Chained('/base') PathPart('') Args {}
  
 
-=head2 default
-
-Standard 404 error page
-
-=cut
-
-sub not_found : Private {
-    my ($self, $c) = @_;
-    $c->res->body('Page not found');
-    $c->res->status(404);
-}
- 
 =head2 end
 
 Attempt to render a view, if needed.
