@@ -1,20 +1,39 @@
-[% labelgroup_name %]
 <div id="breadcrumbs_container">
   <ul id="breadcrumbs">
   
     
-    [% IF location == "start"  %]
-    <li><a  class="active" name="ui-icon-home" href="[% c.uri_for_action('/index')%]">Übersicht</a> </li>
-    <li><a name="ui-icon-pencil" href="[% c.uri_for_action('/label/add')%]">Signaturen eingeben</a></li>
+  
+    <li><a 
+          [% IF location == "start"  %]
+          class="active" 
+          [% END %] 
+        name="ui-icon-home" href="[% c.uri_for_action('/index')%]">Übersicht</a> </li>
+    
+       [% IF location == "start" || title == "Signatur eingeben"  %]   
+        <li>
+     
+      <a name="ui-icon-pencil"
+          [% IF title == "Signatur eingeben" %]
+          class="active" 
+          [% END %] 
+          href="[% c.uri_for_action('/label/add')%]">Signaturen eingeben</a></li>
 
-    [% ELSE %]
-    <li><a name="ui-icon-arrowreturnthick-1-w" href="[% c.uri_for_action('/index')%]">Zur Übersicht</a></li>
-    [%  END %]
-    
-    
+  
+      [% END %]
+    [% IF labelgroup_name %]
+        
+    <li><a style="text-transform: uppercase;" class="active" name="ui-icon-contact" href="#">[% labelgroup_name.replace('_', ' ') %]</a></li>
+    [% END %]
       
-     [% IF roles.grep('admin').size > 0 %]
- <li><a name="ui-icon-locked" href="[% c.uri_for_action('/label/list_admin')%]">Administration</a></li>
+     [% IF roles.grep('admin').size > 0 && title != "Signaturen" %]
+ <li><a 
+     [% IF title == "Administration" %]
+     
+      class="active"    
+      [% END %] 
+ 
+     
+     name="ui-icon-locked" href="[% c.uri_for_action('/label/list_admin')%]">Administration</a></li>
  [% END %] 
  
     

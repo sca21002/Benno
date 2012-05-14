@@ -4,11 +4,21 @@ body {
 	font-size: 97%;
 	margin: 0;
 	padding: 0;
-	font-size: 97%;
-	margin: 0;
-	padding: 0;
 	background-color: #E4F3F6;
 }
+
+
+
+ul#list li:LAST-CHILD {
+  border-bottom: 0 none;
+}
+
+
+
+span.ui-icon {
+  float: left;
+}
+
 
 a,a:link {
 	color: #605E5D;
@@ -19,19 +29,28 @@ input[type="submit"] {
 
 }
 
-input[type="text"] {
+input[type="text"], select {
+  margin: 2px;
   
 }
 
 .message {
   color: darkgreen;
-  font-weight: bold;
+  background-color: #b5fecf;
+  border: 1px solid #84feb0;
+  padding: 2px;
+  margin: 10px 0;
+  display: block;
   
 }
 
 .error {
   color: red;
-  font-weight: bold;
+}
+
+.error input {
+  background-color: #fcc8c8;
+  border: 1px solid #fea0a0;
 }
 
 
@@ -98,6 +117,7 @@ ul#list {
 
 ul#list li {
   margin: 5px;
+  padding: 2px;
 }
 
 

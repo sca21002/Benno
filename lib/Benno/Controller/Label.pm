@@ -59,8 +59,9 @@ sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
     });
    
     $label_rs  = $label_rs->filter_labelgroup($labelgroup->shortname);
-    $c->stash(labels => $label_rs, labelgroup_name => $labelgroup->name);
-    $c->session->{labelgroup_shortname} = $labelgroup->shortname
+    $c->detach('/default') unless $label_rs;
+    $c->log->debug('label_rs (count): ' .  $label_rs->count); 
+    $c->stash(labels => $label_rs, labelgroup_name => $labelgroup->shortname);
 }
  
 
@@ -219,6 +220,7 @@ sub edit : Chained('label') {
 sub add : Chained('labels') {
 	my ( $self, $c ) = @_;
 	$self->save($c);
+$c->stash(title => 'Signatur eingeben');
 }
 
 # both adding and editing happens here

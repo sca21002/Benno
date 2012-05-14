@@ -31,6 +31,8 @@ datePick = function(elem)
 		   sgrid.triggerToolbar();
 	    } } )	;
 }
+
+
 $(document).ready(function() {
 		jQuery("#etikett").jqGrid( {
 			url : "[% json_url %]",
@@ -90,9 +92,10 @@ $(document).ready(function() {
 		});
 		
 		jQuery("#etikett").jqGrid('navGrid', '#pager_etikett', {
-			edit : true,
-			add : true,
-			del : false		});
+			edit : false,
+			add : false,
+			del : false,
+      search: false		});
 
 
 		jQuery("#etikett").jqGrid('navButtonAdd','#pager_etikett',
@@ -153,12 +156,10 @@ $(document).ready(function() {
 		});
 	});
 </script>
-<style>
-#subnav {margin-top: -9px;}
-</style> 
 
 
-[% title = "Administrationsansicht"; %]
+
+[% title = "Administration"; %]
 
 
 
