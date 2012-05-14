@@ -1,4 +1,4 @@
-package Benno::ActionRole::MyACL;
+package Benno::ActionRole::ACL;
 use Moose::Role;
 use namespace::autoclean;
 use Data::Dumper;

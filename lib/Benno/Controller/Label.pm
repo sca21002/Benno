@@ -57,7 +57,7 @@ sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
         printed => undef,
         deleted => undef,        
     });
-    
+   
     $label_rs  = $label_rs->filter_labelgroup($labelgroup->shortname);
     $c->stash(labels => $label_rs, labelgroup_name => $labelgroup->name);
     $c->session->{labelgroup_shortname} = $labelgroup->shortname
@@ -66,12 +66,12 @@ sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
 
 sub list : Chained('labelgroup') PathPart('list') Args(0) {
     my ( $self, $c ) = @_;
-
+    
     $c->stash(json_url => $c->uri_for_action('/label/json', $c->req->captures));
 }
 
 sub list_admin : Chained('/login/required') PathPart('list_admin') Args(0)
-               :  Does(MyACL)
+               :  Does(~ACL)
                :  RequiresRole(admin)
                :  ACLDetachTo(/login/login) {
     
@@ -83,7 +83,7 @@ sub list_admin : Chained('/login/required') PathPart('list_admin') Args(0)
 
 
 sub print :  Chained('labelgroup') PathPart('print') Args(0)
-          :  Does(MyACL)
+          :  Does(~ACL)
           :  AllowedRole(print)
           :  AllowedRole(admin)
           :  ACLDetachTo(denied)
@@ -101,8 +101,9 @@ sub json : Chained('labelgroup') PathPart('json') Args(0) {
 	$c->log->debug( Dumper($data) );
 
 	my $page             = $data->{page} || 1;
-	my $rows_per_page = $c->session->{rows_per_page} = $data->{rows} || $c->session->{rows_per_page} || 25;
-        # my $rows_per_page = $data->{rows} ||  25;
+ 	my $rows_per_page
+            = $c->session->{rows_per_page}
+            = $data->{rows} || $c->session->{rows_per_page} || 25;
 	my $sidx             = $data->{sidx} || 'd11sig';
 	my $sord             = $data->{sord} || 'asc';
 
@@ -150,7 +151,6 @@ sub json_admin : Chained('labels') PathPart('json_admin') Args(0) {
     my $sord             = $data->{sord} || 'asc';
 
     my $filters = $data->{filters};
-    $c->log->debug( Dumper($filters) );
     #$filters = decode_json $filters if $filters;  #ging nicht mit utf8??    
     $filters = from_json $filters if $filters;   
 
@@ -181,33 +181,31 @@ sub json_admin : Chained('labels') PathPart('json_admin') Args(0) {
             }
     );
     
-   # $c->log->debug( Dumper(@and_cond) );
-   
-	my $response;
-	$response->{page}    = $page;
-	$response->{total}   = $label_rs->pager->last_page;
-	$response->{records} = $label_rs->pager->total_entries;
-	my @rows;
-	while ( my $label = $label_rs->next ) {
-		my $row->{id} = $label->id;
-		
-		$row->{cell} = [
-			$label->d11sig,
-			$label->d11tag->set_time_zone('Europe/Berlin')
-			  ->strftime('%d.%m.%Y'),
-			$label->type,
-			$label->printed
-                            && $label->printed->set_time_zone('Europe/Berlin')
-			    ->strftime('%d.%m.%Y') || '',
-                        $label->deleted
-                            && $label->deleted->set_time_zone('Europe/Berlin')
-			    ->strftime('%d.%m.%Y') || '',
-		];
-		push @rows, $row;
-	}
-	$response->{rows} = \@rows;
-
-	$c->stash( %$response, current_view => 'JSON' );
+  
+    my $response;
+    $response->{page}    = $page;
+    $response->{total}   = $label_rs->pager->last_page;
+    $response->{records} = $label_rs->pager->total_entries;
+    my @rows;
+    while ( my $label = $label_rs->next ) {
+            my $row->{id} = $label->id;
+            
+            $row->{cell} = [
+                    $label->d11sig,
+                    $label->d11tag->set_time_zone('Europe/Berlin')
+                      ->strftime('%d.%m.%Y'),
+                    $label->type,
+                    $label->printed
+                        && $label->printed->set_time_zone('Europe/Berlin')
+                        ->strftime('%d.%m.%Y') || '',
+                    $label->deleted
+                        && $label->deleted->set_time_zone('Europe/Berlin')
+                        ->strftime('%d.%m.%Y') || '',
+            ];
+            push @rows, $row;
+    }
+    $response->{rows} = \@rows;
+    $c->stash( %$response, current_view => 'JSON' );
 }
 
 
@@ -284,7 +282,7 @@ sub delete  {
 
 # Should be merged with sub print 
 sub print_selected  : Chained('labels')
-                    :  Does(MyACL)
+                    :  Does(~ACL)
                     :  AllowedRole(print)
                     :  AllowedRole(admin)
                     :  ACLDetachTo(denied) {
@@ -300,7 +298,7 @@ sub print_selected  : Chained('labels')
 }
 
 #sub edit_selected  : Chained('labels')
-#                    :  Does(MyACL)
+#                    :  Does(~ACL)
 #                    :  AllowedRole(print)
 #                    :  AllowedRole(admin)
 #                    :  ACLDetachTo(denied) {

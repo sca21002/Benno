@@ -27,6 +27,7 @@ The root page (/)
 
 =cut
 
+
 sub base : Chained('/') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
 
@@ -40,10 +41,9 @@ sub base : Chained('/') PathPart('') CaptureArgs(0) {
     $c->stash(
         roles       => [ @roles ],
         labelgroups => [$c->model('BennoDB::Labelgroup')->search($search)->all],
-        can_print   => first { 'admin'|'print' } @roles,
+        can_print   => (first { 'admin'|'print' } @roles),
         rows_per_page => $c->session->{rows_per_page} || 25,
     );    
-
 }
  
 sub index : Chained('/base') PathPart('index') Args(0) {}  
@@ -54,7 +54,9 @@ sub home : Chained('/base') PathPart('') Args {
     my $lg_short = $c->session->{labelgroup_shortname};
     if ( $lg_short ) {
         $c->res->redirect( $c->uri_for_action( '/label/list', [$lg_short] ) );
-    }    
+    } else {
+        $c->res->redirect( $c->uri_for_action( '/index' ) );
+    }
 }
 
 

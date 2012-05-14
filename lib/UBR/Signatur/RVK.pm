@@ -136,12 +136,12 @@ my $signatur_reg = qr{
 }xms;
 
 
-my %lkz_for_extern = ('9998' => 'AMA', '9996' => 'BMA');
+# my %lkz_for_extern = ('9998' => 'AMA', '9996' => 'BMA');
 
 my @lkz_weiss = ('13', '1301',
                  '7310', '8015', '8016', '802', '803', '8441',
                  '9112', '9113', '9113', '9114', '9115', '9116', '9117',
-                 '927',  '931', '9310');
+                 '927',  '931', '9310', '9996', '9998');
 
 sub BUILDARGS {
       my $class = shift;
@@ -196,7 +196,7 @@ sub get_label_type {
     my $lkz = $self->sig_hashref->{LKZ};
     my $untergruppe = $self->sig_hashref->{Untergruppe};
     
-    return $lkz_for_extern{$lkz} if $lkz_for_extern{$lkz};
+    # return $lkz_for_extern{$lkz} if $lkz_for_extern{$lkz};
     
     return 'rot'  if $lkz eq '19'
                 or $lkz eq '400'

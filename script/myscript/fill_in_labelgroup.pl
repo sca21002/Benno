@@ -58,12 +58,19 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
             shortname => 'zb_weiss',
             name => 'ZB weiß',
             search => {
-                d11sig => {
-                    '-or' => {'<' => '30/', '>' => '80/'},
-                    '-not_like' => '180/%',
-                },
+                d11sig => [
+                    -or => 
+                    {'<' => '30/'},
+                    [ -and => {'>' => '80/'},
+                              {'not_like' => '180/%'},
+                              {'not_like' => '9996/%'},
+                              {'not_like' => '9998/%'},
+                
+                    ],
+                ],
                 type   => 'weiss',
-            },
+            },      
+                      
         },
         {
             shortname => 'zb_rot',
@@ -73,12 +80,16 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
         {
             shortname => 'bma',
             name => 'Bayerische Musikakademie Alteglofsheim',
-            search => { type => 'bma' },
+            search => {
+                d11sig => { like => '9996/%' }
+            },
         },        
         {
             shortname => 'ama',
             name => 'Stadtmuseum Abensberg',
-            search => { type => 'ama' },
+            search => {
+                d11sig => { like => '9998/%' }
+            },
         },
         {
             shortname => 'msr',
