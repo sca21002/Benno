@@ -37,64 +37,47 @@ sub labels : Chained('/base') PathPart('etikett') CaptureArgs(0) {
 sub label : Chained('labels') PathPart('') CaptureArgs(1) {
 	my ( $self, $c, $id ) = @_;
 
-	my $label = $c->stash->{label} = $c->stash->{labels}->find($id);
-        unless ($label) {
-        $c->stash(
-            error_msg => "Signatur mit ID $id nicht gefunden!"
-        );
-        $c->detach('/base');
-    }
-
+	$c->stash->{label} = $c->stash->{labels}->find($id) 
+            or $self->error_msg($c, "Signatur mit ID $id nicht gefunden!");
 }
 
 sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
     my ( $self, $c, $labelgroup_shortname ) = @_;
    
     my $labelgroups = $c->stash->{labelgroups};
+    
     $c->log->debug('labelgroup: ' . $labelgroup_shortname);
+    
     my $labelgroup
         = first {$_->shortname eq $labelgroup_shortname} @$labelgroups;
-    unless ($labelgroup) {
-        $c->stash(
-            error_msg => "Signaturgruppe $labelgroup_shortname nicht gefunden!"
-        );
-        $c->detach('/base');
-    }
+    $self->error_msg($c, "Signaturgruppe $labelgroup_shortname nicht gefunden!")
+        unless $labelgroup;
+        
     my $label_rs = $c->stash->{labels}->search({
         printed => undef,
         deleted => undef,        
     });
+    
     $label_rs  = $label_rs->filter_labelgroup($labelgroup->shortname);
-    $c->detach('/default') unless $label_rs;
-    $c->log->debug('label_rs (count): ' .  $label_rs->count); 
     $c->stash(labels => $label_rs, labelgroup_name => $labelgroup->name);
+    $c->session->{labelgroup_shortname} = $labelgroup->shortname
 }
  
 
 sub list : Chained('labelgroup') PathPart('list') Args(0) {
     my ( $self, $c ) = @_;
-    
-    $c->log->debug('URI for action: ' . $c->uri_for_action('/label/json',  $c->req->captures));
-    $c->stash(
-	json_url => $c->uri_for_action('/label/json', $c->req->captures)
-    );
+
+    $c->stash(json_url => $c->uri_for_action('/label/json', $c->req->captures));
 }
 
 sub list_admin : Chained('/login/required') PathPart('list_admin') Args(0)
-          :  Does(MyACL)
-          :  RequiresRole(admin)
-          :  ACLDetachTo(/login/login) {
+               :  Does(MyACL)
+               :  RequiresRole(admin)
+               :  ACLDetachTo(/login/login) {
+    
     my ( $self, $c ) = @_;
         
-    my @roles = ( $c->model('BennoDB::Client')->roles($c->req->address) );
-    push @roles, $c->user->roles if $c->user;      
-        
-    $c->stash(
-        roles       => [ @roles ],
-        labelgroups => [ $c->model('BennoDB::Labelgroup')->search({})->all ],
-        labels      => $c->model('BennoDB::Label'),
-        json_url    => $c->uri_for_action('label/json_admin'),
-    );
+    $c->stash( json_url  => $c->uri_for_action('label/json_admin') );
 }
 
 
@@ -118,7 +101,8 @@ sub json : Chained('labelgroup') PathPart('json') Args(0) {
 	$c->log->debug( Dumper($data) );
 
 	my $page             = $data->{page} || 1;
-	my $entries_per_page = $data->{rows} || 25;
+	my $rows_per_page = $c->session->{rows_per_page} = $data->{rows} || $c->session->{rows_per_page} || 25;
+        # my $rows_per_page = $data->{rows} ||  25;
 	my $sidx             = $data->{sidx} || 'd11sig';
 	my $sord             = $data->{sord} || 'asc';
 
@@ -128,7 +112,7 @@ sub json : Chained('labelgroup') PathPart('json') Args(0) {
 		{},
 		{
 			page     => $page,
-			rows     => $entries_per_page,
+			rows     => $rows_per_page,
 			order_by => "$sidx $sord",
 		}
 	);
@@ -161,7 +145,7 @@ sub json_admin : Chained('labels') PathPart('json_admin') Args(0) {
     $c->log->debug( Dumper($data) );
 
     my $page             = $data->{page} || 1;
-    my $entries_per_page = $data->{rows} || 45;
+    my $rows_per_page = $data->{rows} || 45;
     my $sidx             = $data->{sidx} || 'd11sig';
     my $sord             = $data->{sord} || 'asc';
 
@@ -192,7 +176,7 @@ sub json_admin : Chained('labels') PathPart('json_admin') Args(0) {
         $search,
         {
             page => $page,
-            rows => $entries_per_page,
+            rows => $rows_per_page,
             order_by => "$sidx $sord",
             }
     );
@@ -384,13 +368,22 @@ sub print_do {
     }
 }
 
-
 sub denied : Private {
     my ($self, $c) = @_;
  
-    $c->res->redirect($c->uri_for($self->action_for('/index'),
-        {status_msg => "Access Denied"}));
+    $c->res->redirect(
+        $c->uri_for_action('/index', {status_msg => "Access Denied"} )
+    );
 }
+
+sub error_msg {
+    my ($self, $c, $msg) = @_;
+    
+    $msg ||= 'Es ist ein Fehler aufgetreten.';
+    $c->stash( error_msg => $msg );
+    $c->detach('/base');
+}
+
 
 =head1 AUTHOR
 

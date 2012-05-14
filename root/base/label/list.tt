@@ -13,9 +13,9 @@ jQuery("#etikett").jqGrid({
         {name:'d11tag', sortable: true, width:120},
        
     ],
-    rowNum:25,
+    rowNum: [% c.rows_per_page %],
     height: "100%",
-    width: "778",
+    width: "778", 
     rowList:[10,20,30,40,50,60,70,80,90,100],
     pager: '#pager_etikett',
     sortname: 'd11sig',

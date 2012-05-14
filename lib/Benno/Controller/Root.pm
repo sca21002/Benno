@@ -30,6 +30,7 @@ The root page (/)
 sub base : Chained('/') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
 
+
     my @roles = ( $c->model('BennoDB::Client')->roles($c->req->address) );
     push @roles, $c->user->roles if $c->user;  
     
@@ -40,12 +41,23 @@ sub base : Chained('/') PathPart('') CaptureArgs(0) {
         roles       => [ @roles ],
         labelgroups => [$c->model('BennoDB::Labelgroup')->search($search)->all],
         can_print   => first { 'admin'|'print' } @roles,
+        rows_per_page => $c->session->{rows_per_page} || 25,
     );    
 
 }
  
-sub index : Chained('/base') PathPart('') Args {}
+sub index : Chained('/base') PathPart('index') Args(0) {}  
  
+sub home : Chained('/base') PathPart('') Args {
+    my ($self, $c) = @_;
+        
+    my $lg_short = $c->session->{labelgroup_shortname};
+    if ( $lg_short ) {
+        $c->res->redirect( $c->uri_for_action( '/label/list', [$lg_short] ) );
+    }    
+}
+
+
 
 =head2 end
 

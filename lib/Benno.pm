@@ -17,6 +17,8 @@ use Catalyst::Runtime 5.80;
 # Static::Simple: will serve static files from the application's root
 #                 directory
 
+# StatusMessage: if messages should survive redirects
+
 use Catalyst qw/
     -Debug
     ConfigLoader
@@ -69,10 +71,18 @@ __PACKAGE__->config(
     },
     'Controller::Login' => {
         #traits => ['-RenderAsTTTemplate'],
-           login_form_args => {
+        login_form_args => {
                authenticate_username_field_name => 'username',
                authenticate_password_field_name => 'password',
         #       authenticate_args => { active => 'Y' },
+        },
+        actions => {
+            required => {
+                Chained => '/label/labels',
+                PathPart => '',
+                CaptureArgs => 0,
+                Does => ['NeedsLogin'],                         
+            },
         },
     },
 );
