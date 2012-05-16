@@ -1,6 +1,7 @@
 [% path = title; %]
 <script type="text/javascript">
 
+  
 jQuery(function($){
     $.datepicker.regional['de'] = {clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
             closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
@@ -73,10 +74,8 @@ $(document).ready(function() {
 				editable: true,
 				width : 140,
 				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
-			},                        
-                        
-                        
-                        ],
+			}],
+    
 			rowNum : 25,
 			height : "100%",
 			width : "778",
@@ -126,19 +125,19 @@ $(document).ready(function() {
 		
 		$('#print_selected').click(function() {
 			var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
- 			window.open("[% c.uri_for_action('/label/ajax') %]?id="+gr+"&oper=print", "_self");
+		window.open("[% c.uri_for_action('/label/print_selected') %]?id="+gr);
  		
 			if( gr != null ) {
 				$.ajax({
-					url: "[% c.uri_for_action('/label/ajax') %]", 
-					data: {id: gr, oper: "print"}
+			url: "[% c.uri_for_action('/label/print_selected') %]", 
+			data: {id: gr}
 				});
 			}
 			else alert("Bitte eine Zeile auswählen!");
+
 			$('#etikett').trigger('reloadGrid');
 
 		});
-
 
 		$('#etikett').jqGrid('filterToolbar',  {
 			stringResult : true,
@@ -164,7 +163,6 @@ $(document).ready(function() {
 
 
 
-
 <ul id="subnav">
 
       <li class="default">   
@@ -175,10 +173,15 @@ $(document).ready(function() {
       <li class="default">   
       <a name='ui-icon-print' id="print_selected" href="#">Ausgewählte drucken</a>
       </li>
+      
  
     <li>
       <a id="delete" name="ui-icon-trash" >Ausgewählte löschen</a>
     </li>
+    
+    <li class="default">   
+      <a name='ui-icon-arrowrefresh-1-n' href="#">Ausgewählte zurücksetzen</a>
+      </li>
 
   </ul>
 

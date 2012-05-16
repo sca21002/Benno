@@ -36,7 +36,8 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
             name => 'PT',
             search => {
                 d11sig => [
-                    { '>' => '50/', '<' => '80/' }, 
+                    { '>' => '50/', '<' => '80/' },
+                    { '>' => '151/', '<' => '163/'}, 
                     {'-like' => '180/%'}
                 ],
                 type   => 'weiss',                  
@@ -61,7 +62,8 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
                 d11sig => [
                     -or => 
                     {'<' => '30/'},
-                    [ -and => {'>' => '80/'},
+                    {'>' => '80/', '<' => '151/'},
+                    [ -and => {'>' => '163/'},
                               {'not_like' => '180/%'},
                               {'not_like' => '9996/%'},
                               {'not_like' => '9998/%'},

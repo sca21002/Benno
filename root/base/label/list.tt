@@ -1,4 +1,36 @@
 <script type="text/javascript">    
+  
+  
+jQuery(function($){
+    $.datepicker.regional['de'] = {clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
+            closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
+            prevText: '&#x3c;zurück', prevStatus: 'letzten Monat zeigen',
+            nextText: 'Vor&#x3e;', nextStatus: 'nächsten Monat zeigen',
+            currentText: 'heute', currentStatus: '',
+            monthNames: ['Januar','Februar','März','April','Mai','Juni',
+            'Juli','August','September','Oktober','November','Dezember'],
+            monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
+            'Jul','Aug','Sep','Okt','Nov','Dez'],
+            monthStatus: 'anderen Monat anzeigen', yearStatus: 'anderes Jahr anzeigen',
+            weekHeader: 'Wo', weekStatus: 'Woche des Monats',
+            dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+            dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+            dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+            dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'Wähle D, M d',
+            dateFormat: 'dd.mm.yy', firstDay: 1, 
+            initStatus: 'Wähle ein Datum', isRTL: false};
+    $.datepicker.setDefaults($.datepicker.regional['de']);
+});
+
+datePick = function(elem)
+{
+   jQuery(elem).datepicker( { 
+	   dateFormat: 'yy-mm-dd',
+	   onSelect: function(dateText, inst) { 	
+		   var sgrid = $("#etikett")[0];
+		   sgrid.triggerToolbar();
+	    } } )	;
+}
 
 $(document).ready(function() {
   
@@ -7,10 +39,12 @@ jQuery("#etikett").jqGrid({
     url:"[% json_url %]",
     datatype: "json",
     mtype: "POST",
-    colNames:['Signatur' , 'Datum'],
+    colNames:['Signatur' , 'Vom'],
     colModel:[
         {name:'d11sig', sortable: true, width:250},
-        {name:'d11tag', sortable: true, width:120},
+        {name:'d11tag', sortable: true, width:120,
+        searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
+      },
        
     ],
     rowNum: [% rows_per_page %],
@@ -25,7 +59,18 @@ jQuery("#etikett").jqGrid({
     caption:"Etiketten",
     editurl: "[% c.uri_for_action('/label/ajax') %]"
 });
-jQuery("#etikett").jqGrid('navGrid','#pager_etikett',{edit:false,add:false,del:false});
+jQuery("#etikett").jqGrid('navGrid','#pager_etikett',{
+  edit:false,
+  add:false,
+  del:false,
+  search:false});
+
+jQuery("#etikett").jqGrid('navButtonAdd','#pager_etikett',
+				{caption:"Filter zurücksetzen", onClickButton:function()
+			{ var grid = $("#etikett");
+			grid[0].clearToolbar();
+			} }); 
+
 
 $('#print_selected').click(function() {
 	var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
@@ -42,6 +87,11 @@ $('#print_selected').click(function() {
 	$('#etikett').trigger('reloadGrid');
 
 });
+
+	$('#etikett').jqGrid('filterToolbar',  {
+			stringResult : true,
+			searchOnEnter : true
+		});
 
 
 

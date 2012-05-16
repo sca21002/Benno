@@ -108,16 +108,37 @@ sub json : Chained('labelgroup') PathPart('json') Args(0) {
 	my $sidx             = $data->{sidx} || 'd11sig';
 	my $sord             = $data->{sord} || 'asc';
 
-	my $label_rs = $c->stash->{labels};
+	  my $filters = $data->{filters};
+    #$filters = decode_json $filters if $filters;  #ging nicht mit utf8??    
+    $filters = from_json $filters if $filters;   
 
-	$label_rs = $label_rs->search(
-		{},
-		{
-			page     => $page,
-			rows     => $rows_per_page,
-			order_by => "$sidx $sord",
-		}
-	);
+    my $label_rs = $c->stash->{labels};
+   
+    my ($search, $labelgroup);
+    
+    foreach my $rule ( @{ $filters->{rules} } ) {
+        my $field = $rule->{field};
+        my $data = $rule->{data};
+        if ($field eq 'type') {
+            $labelgroup = $data;
+        } else {
+            $search->{"me.$field"} = { like => "%$data%" };
+        }    
+    }
+    
+    if ($labelgroup) {
+        $label_rs = $label_rs->filter_labelgroup($labelgroup);    
+    }
+    
+    $label_rs = $label_rs->search(
+        $search,
+        {
+            page => $page,
+            rows => $rows_per_page,
+            order_by => "$sidx $sord",
+            }
+    );
+    
 
 	my $response;
 	$response->{page}    = $page;

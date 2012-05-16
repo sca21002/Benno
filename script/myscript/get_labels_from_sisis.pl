@@ -143,7 +143,7 @@ foreach my $data (@data) {
     else {
         $schema_benno->resultset('Label')->create($data);
         $etikett_logger->warn($data->{d11sig}. ": " . $msg || '<ohne Fehlermeldung>')
-            if $data->{typ} eq 'error';
+            if $data->{type} eq 'error';
     }    
 }
 $root_logger->info("get_label_from_sisis.pl beendet.");
