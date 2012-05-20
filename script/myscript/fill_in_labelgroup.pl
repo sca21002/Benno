@@ -19,20 +19,24 @@ my $schema_benno = Benno::Schema->connect(
 $schema_benno->resultset('Labelgroup')->delete();
 my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
     [
-        {   shortname   => 'alle',
+        {
+            urlname     => 'alle',
+            shortname   => 'Alle',
             name => 'Alle',
             search => {},
         },
         {
-            shortname => 'rw', 
-            name => 'Wirtschaft & Recht',
+            urlname     => 'rw',
+            shortname => 'R & W', 
+            name => 'Recht & Wirtschaft',
             search => {
                 d11sig =>  { '>' => '30/', '<' => '50/' },
                 type   =>  'weiss',              
             }
         },
         {
-            shortname => 'pt',
+            urlname     => 'pt',
+            shortname => 'PT',
             name => 'PT',
             search => {
                 d11sig => [
@@ -44,6 +48,7 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
             },
         },
         #{
+        #    urlname     => 'alle',
         #    shortname => 'med',
         #    name => 'Medizin',
         #    search => {
@@ -56,8 +61,9 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
         #    },
         #},
         {
-            shortname => 'zb_weiss',
-            name => 'ZB weiß',
+            urlname     => 'zb_weiss',
+            shortname => 'ZB Weiß',
+            name => 'ZB Weiß',
             search => {
                 d11sig => [
                     -or => 
@@ -75,26 +81,30 @@ my @labelgroups = $schema_benno->resultset('Labelgroup')->populate(
                       
         },
         {
-            shortname => 'zb_rot',
-            name => 'ZB rot',
+            urlname     => 'zb_rot',
+            shortname => 'ZB Rot',
+            name => 'ZB Rot',
             search => { type => 'rot' },
         },
         {
-            shortname => 'bma',
+            urlname     => 'bma',
+            shortname => 'BMA',
             name => 'Bayerische Musikakademie Alteglofsheim',
             search => {
                 d11sig => { like => '9996/%' }
             },
         },        
         {
-            shortname => 'ama',
+            urlname     => 'ama',
+            shortname => 'AMA',
             name => 'Stadtmuseum Abensberg',
             search => {
                 d11sig => { like => '9998/%' }
             },
         },
         {
-            shortname => 'msr',
+            urlname     => 'msr',
+            shortname => 'MSR',
             name => 'Museum der Stadt Regensburg',
             search => { type => 'msr' },
         },        

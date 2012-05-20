@@ -55,6 +55,7 @@ CREATE TABLE users_roles (
 DROP TABLE IF EXISTS labelgroups;
 CREATE TABLE labelgroups (
    id INTEGER unsigned NOT NULL auto_increment,
+   urlname varchar(50) UNIQUE,
    shortname VARCHAR(50) UNIQUE,
    name VARCHAR(255) UNIQUE,
    search TEXT,

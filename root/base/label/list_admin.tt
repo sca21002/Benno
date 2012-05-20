@@ -65,21 +65,21 @@ $(document).ready(function() {
 				name : 'printed',
 				sortable : true,
 				editable: true,
-				width : 140,
+				width : 160,
 				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
 			},
 			{
 				name : 'deleted',
 				sortable : true,
 				editable: true,
-				width : 140,
+				width : 160,
 				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
 			}],
     
 			rowNum : 25,
 			height : "100%",
 			width : "778",
-			rowList : [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+			rowList : [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
 			pager : '#pager_etikett',
 			sortname : 'd11tag',
 			viewrecords : true,
@@ -138,6 +138,20 @@ $(document).ready(function() {
 			$('#etikett').trigger('reloadGrid');
 
 		});
+                
+		$('#reset_selected').click(function() {
+			var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
+                    if( gr != null ) {
+				$.ajax({
+			url: "[% c.uri_for_action('/label/reset_selected') %]", 
+			data: {id: gr}
+				});
+			}
+			else alert("Bitte eine Zeile auswählen!");
+
+			$('#etikett').trigger('reloadGrid');
+
+		});
 
 		$('#etikett').jqGrid('filterToolbar',  {
 			stringResult : true,
@@ -171,16 +185,16 @@ $(document).ready(function() {
       </li> 
       
       <li class="default">   
-      <a name='ui-icon-print' id="print_selected" href="#">Ausgewählte drucken</a>
+      <a name='ui-icon-print' id="print_selected" href="#">Auswahl drucken</a>
       </li>
       
  
     <li>
-      <a id="delete" name="ui-icon-trash" >Ausgewählte löschen</a>
+      <a id="delete" name="ui-icon-trash" >Auswahl löschen</a>
     </li>
     
     <li class="default">   
-      <a name='ui-icon-arrowrefresh-1-n' href="#">Ausgewählte zurücksetzen</a>
+      <a name='ui-icon-arrowrefresh-1-n' id="reset_selected" href="#">Auswahl zurücksetzen</a>
       </li>
 
   </ul>

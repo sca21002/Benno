@@ -7,12 +7,10 @@ use DateTime;
 use JSON;
 use List::Util qw(first);
 use Data::Dumper;
+use utf8;
 
 
-BEGIN {extends 'Catalyst::Controller::ActionRole'; }
-
-has label_type =>
-  ( is => 'rw', isa => 'Str', required => 1, default => sub { 'weiss' } );
+BEGIN { extends 'Catalyst::Controller::ActionRole'; }
 
 =head1 NAME
 
@@ -42,26 +40,26 @@ sub label : Chained('labels') PathPart('') CaptureArgs(1) {
 }
 
 sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
-    my ( $self, $c, $labelgroup_shortname ) = @_;
+    my ( $self, $c, $labelgroup_urlname ) = @_;
    
     my $labelgroups = $c->stash->{labelgroups};
-    
-    $c->log->debug('labelgroup: ' . $labelgroup_shortname);
+    $c->log->debug('labelgroup: ' . $labelgroup_urlname);
     
     my $labelgroup
-        = first {$_->shortname eq $labelgroup_shortname} @$labelgroups;
-    $self->error_msg($c, "Signaturgruppe $labelgroup_shortname nicht gefunden!")
+        = first {$_->urlname eq $labelgroup_urlname} @$labelgroups;
+    $self->error_msg($c, "Signaturgruppe $labelgroup_urlname nicht gefunden!")
         unless $labelgroup;
-        
+         
     my $label_rs = $c->stash->{labels}->search({
         printed => undef,
         deleted => undef,        
     });
    
-    $label_rs  = $label_rs->filter_labelgroup($labelgroup->shortname);
-    $c->detach('/default') unless $label_rs;
+    $label_rs  = $label_rs->filter_labelgroup($labelgroup->urlname);
+    $self->error_msg($c, 'Interner Fehler') unless $label_rs;
     $c->log->debug('label_rs (count): ' .  $label_rs->count); 
-    $c->stash(labels => $label_rs, labelgroup_name => $labelgroup->shortname);
+    $c->stash(labels => $label_rs, labelgroup => $labelgroup);
+    $c->session->{labelgroup} = $labelgroup; 
 }
  
 
@@ -70,6 +68,7 @@ sub list : Chained('labelgroup') PathPart('list') Args(0) {
     
     $c->stash(json_url => $c->uri_for_action('/label/json', $c->req->captures));
 }
+
 
 sub list_admin : Chained('/login/required') PathPart('list_admin') Args(0)
                :  Does(~ACL)
@@ -96,19 +95,19 @@ sub print :  Chained('labelgroup') PathPart('print') Args(0)
 
 
 sub json : Chained('labelgroup') PathPart('json') Args(0) {
-	my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-	my $data = $c->req->params;
-	$c->log->debug( Dumper($data) );
+    my $data = $c->req->params;
+    $c->log->debug( Dumper($data) );
 
-	my $page             = $data->{page} || 1;
- 	my $rows_per_page
-            = $c->session->{rows_per_page}
-            = $data->{rows} || $c->session->{rows_per_page} || 25;
-	my $sidx             = $data->{sidx} || 'd11sig';
-	my $sord             = $data->{sord} || 'asc';
+    my $page             = $data->{page} || 1;
+    my $rows_per_page
+        = $c->session->{rows_per_page}
+        = $data->{rows} || $c->session->{rows_per_page} || 25;
+    my $sidx             = $data->{sidx} || 'd11sig';
+    my $sord             = $data->{sord} || 'asc';
 
-	  my $filters = $data->{filters};
+    my $filters = $data->{filters};
     #$filters = decode_json $filters if $filters;  #ging nicht mit utf8??    
     $filters = from_json $filters if $filters;   
 
@@ -168,7 +167,9 @@ sub json_admin : Chained('labels') PathPart('json_admin') Args(0) {
     $c->log->debug( Dumper($data) );
 
     my $page             = $data->{page} || 1;
-    my $rows_per_page = $data->{rows} || 45;
+    my $rows_per_page
+        = $c->session->{rows_per_page}
+        = $data->{rows} || $c->session->{rows_per_page} || 25;
     my $sidx             = $data->{sidx} || 'd11sig';
     my $sord             = $data->{sord} || 'asc';
 
@@ -219,7 +220,7 @@ sub json_admin : Chained('labels') PathPart('json_admin') Args(0) {
                     $label->type,
                     $label->printed
                         && $label->printed->set_time_zone('Europe/Berlin')
-                        ->strftime('%d.%m.%Y') || '',
+                        ->strftime('%d.%m.%Y %H:%M') || '',
                     $label->deleted
                         && $label->deleted->set_time_zone('Europe/Berlin')
                         ->strftime('%d.%m.%Y') || '',
@@ -259,7 +260,7 @@ sub save  {
             });                                                              
     $c->log->debug(Data::Dumper::Dumper($c->req->params));
     my $form = Benno::Form::Label->new;
-    $c->stash( template => 'label/edit.tt', form => $form );
+    $c->stash( template => 'label/edit.tt', form => $form);
     $form->process( item => $label, params => $c->req->params );
     if ($form->validated) {
         $c->stash(status_msg => 'Signatur ' . $label->d11sig . ' gespeichert.');
@@ -305,10 +306,10 @@ sub delete  {
 
 # Should be merged with sub print 
 sub print_selected  : Chained('labels')
-                    :  Does(~ACL)
-                    :  AllowedRole(print)
-                    :  AllowedRole(admin)
-                    :  ACLDetachTo(denied) {
+                    : Does(~ACL)
+                    : AllowedRole(print)
+                    : AllowedRole(admin)
+                    : ACLDetachTo(denied) {
 
 	my ( $self, $c ) = @_;
 
@@ -319,6 +320,28 @@ sub print_selected  : Chained('labels')
         $c->stash->{labels} = $label_rs->search({id => \@label_ids});
         $self->print_do($c);
 }
+
+sub reset_selected  : Chained('labels')
+                    : Does(~ACL)
+                    : AllowedRole(print)
+                    : AllowedRole(admin)
+                    : ACLDetachTo(denied) {
+
+    my ( $self, $c ) = @_;
+
+	my $label_rs = $c->stash->{labels};
+	my $data       = $c->req->params;
+        my $id         = $data->{id} || 11222;
+        my @label_ids = split( /,/, $id );
+        $label_rs = $label_rs->search({id => \@label_ids});
+        $label_rs->update( { printed => undef, deleted => undef } );
+
+  
+    
+        my $response->{rows} = scalar @label_ids;
+        $c->stash( %$response, current_view => 'JSON' );
+}                    
+                    
 
 #sub edit_selected  : Chained('labels')
 #                    :  Does(~ACL)
@@ -363,9 +386,15 @@ sub print_do {
 	undef,
     	{ order_by => 'd11sig' }
     );
-    my $labels;
+    my ($labels, $label_type);
     while ( my $label = $label_rs->next ) {
-	push @$labels, Benno::UI::ViewPort::Field::Signatur->new(
+        $label_type = $label->type unless $label_type;
+        if ($label_type eq 'error' or $label_type ne $label->type) {
+            $self->error_msg($c,
+                'Falscher Typ ' . $label->type . ' für ' . $label->d11sig
+            );
+        }
+        push @$labels, Benno::UI::ViewPort::Field::Signatur->new(
 	    signatur_str => $label->d11sig, );
     }
     my $today =
@@ -375,7 +404,7 @@ sub print_do {
         current_view => 'PostScript',
 	template     => 'postscript/print.tt',
 	etiketten    => $labels,
-	etikett_typ  => 'WeissesEtikett',
+	etikett_typ  => $label_type eq 'rot' ? 'RotesEtikett' : 'WeissesEtikett',
     );
     if ( $c->forward('Benno::View::PostScript') ) {
         $c->response->content_type('application/postscript');

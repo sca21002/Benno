@@ -6,4 +6,3 @@
 [% form.field('type').render %]
 [% form.field('submit').render %]
 </form>
-[% location = "add"; %]

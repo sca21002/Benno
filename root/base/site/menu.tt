@@ -1,55 +1,42 @@
 <div id="breadcrumbs_container">
-  <ul id="breadcrumbs">
-  
-    
-  
-    <li><a 
-          [% IF location == "start"  %]
-          class="active" 
-          [% END %] 
-        name="ui-icon-home" href="[% c.uri_for_action('/index')%]">Übersicht</a> </li>
-        
-        
-        
-     [% IF location == "add"  %]
-       <li>
-     
-      <a name="ui-icon-contact" href="[% c.uri_for_action('/label/add')%]">Dummy</a></li>
-          [% END %]   
-        
-        
-    
+    <ul id="breadcrumbs">
+    Template: [% template.name %]
+    <li><a
+        [% IF template.name == "index.tt"  %]
+            class="active" 
+        [% END %] 
+        name="ui-icon-home" href="[% c.uri_for_action('/index')%]">Übersicht</a>
+    </li>
+      
+    [% IF template.name == "label/edit.tt" or template.name == "label/list.tt" %]
         <li>
-     
-      <a name="ui-icon-pencil"
-        [% IF location == "add"  %]
-          class="active" 
-          [% END %] 
-          href="[% c.uri_for_action('/label/add')%]">Neu eingeben</a></li>
-
-          
-      
-      
-    [% IF labelgroup_name %]
-        
-    <li><a style="text-transform: uppercase;" class="active" name="ui-icon-contact" href="#">[% labelgroup_name.replace('_', ' ') %]</a></li>
-    [% END %]
-      
-     [% IF roles.grep('admin').size > 0 && title != "Signaturen" %]
- <li><a 
-     [% IF title == "Administration" %]
-     
-      class="active"    
-      [% END %] 
- 
-     
-     name="ui-icon-locked" href="[% c.uri_for_action('/label/list_admin')%]">Admin</a></li>
- [% END %] 
- 
+            <a name="ui-icon-contact"
+                [% IF template.name == "label/list.tt" %]   
+                    class="active" 
+                [% END %]      
+            href="[% c.uri_for_action('/label/list',[labelgroup.urlname])%]">[% labelgroup.shortname %]</a>
+        </li>
+    [% END %]   
     
-  </ul>
+    [% IF template.name != "input text" %] 
+        <li>
+            <a name="ui-icon-pencil"
+                [% IF template.name == "label/edit.tt"  %]
+                    class="active" 
+                [% END %] 
+            href="[% c.uri_for_action('/label/add')%]">Neu eingeben</a>
+        </li>
+    [% END %]
+    
+    [% IF roles.grep('admin').size > 0 %]
+    <li><a 
+        [% IF title == "Administration" %]
+            class="active"    
+        [% END %] 
+        name="ui-icon-locked" href="[% c.uri_for_action('/label/list_admin')%]">Admin</a></li>
+    [% END %] 
+    </ul>
 </div>
-
 
 <script type="text/javascript">
         

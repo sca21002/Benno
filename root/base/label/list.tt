@@ -107,13 +107,6 @@ $('#delete').click(function(){
 
 </script>   
 
-
-
-[% title = "Signaturen"; %]
-
-
-
-
 <ul id="subnav">
     
  [% IF can_print; %]

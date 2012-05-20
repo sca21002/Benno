@@ -47,6 +47,12 @@ __PACKAGE__->table("labelgroups");
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 urlname
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 50
+
 =head2 shortname
 
   data_type: 'varchar'
@@ -74,6 +80,8 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
+  "urlname",
+  { data_type => "varchar", is_nullable => 1, size => 50 },
   "shortname",
   { data_type => "varchar", is_nullable => 1, size => 50 },
   "name",
@@ -120,9 +128,21 @@ __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 __PACKAGE__->add_unique_constraint("shortname", ["shortname"]);
 
+=head2 C<urlname>
 
-# Created by DBIx::Class::Schema::Loader v0.07023 @ 2012-05-06 14:17:33
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cDwCkBEZcVGWGcG2iMnfXQ
+=over 4
+
+=item * L</urlname>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("urlname", ["urlname"]);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07023 @ 2012-05-17 13:42:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:p/Bm/o/cXlp08ulO/Sg8Tw
 
 
 use JSON;

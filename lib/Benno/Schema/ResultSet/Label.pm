@@ -11,7 +11,7 @@ sub filter_labelgroup {
     
     my $labelgroup_row
         = $self->result_source->schema->resultset('Labelgroup')->find(
-            { shortname => $labelgroup }
+            { urlname => $labelgroup }
         );
     return unless $labelgroup_row;
     return $self->search( { %{$labelgroup_row->search}  } );

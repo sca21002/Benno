@@ -2,7 +2,6 @@ package Benno::ActionRole::ACL;
 use Moose::Role;
 use namespace::autoclean;
 use Data::Dumper;
-
  
 sub BUILD { }
  
@@ -45,7 +44,6 @@ sub client_has {
     my ($self, $c) = @_;
      
     return $c->model('BennoDB::Client')->client_has($c->req->address);
-
 }
 
 sub user_has {
