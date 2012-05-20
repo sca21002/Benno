@@ -1,6 +1,5 @@
 <div id="breadcrumbs_container">
     <ul id="breadcrumbs">
-    Template: [% template.name %]
     <li><a
         [% IF template.name == "index.tt"  %]
             class="active" 
@@ -8,7 +7,7 @@
         name="ui-icon-home" href="[% c.uri_for_action('/index')%]">Übersicht</a>
     </li>
       
-    [% IF template.name == "label/edit.tt" or template.name == "label/list.tt" %]
+    [% IF labelgroup and (template.name == "label/edit.tt" or template.name == "label/list.tt") %]
         <li>
             <a name="ui-icon-contact"
                 [% IF template.name == "label/list.tt" %]   
@@ -24,7 +23,7 @@
                 [% IF template.name == "label/edit.tt"  %]
                     class="active" 
                 [% END %] 
-            href="[% c.uri_for_action('/label/add')%]">Neu eingeben</a>
+            href="[% c.uri_for_action('/label/add')%]">Eingeben</a>
         </li>
     [% END %]
     

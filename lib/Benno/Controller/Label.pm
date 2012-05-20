@@ -47,9 +47,11 @@ sub labelgroup : Chained('labels') PathPart('') CaptureArgs(1) {
     
     my $labelgroup
         = first {$_->urlname eq $labelgroup_urlname} @$labelgroups;
-    $self->error_msg($c, "Signaturgruppe $labelgroup_urlname nicht gefunden!")
-        unless $labelgroup;
-         
+    unless ($labelgroup) {
+        delete $c->stash->{labelgroup}; 
+        delete $c->session->{labelgroup};
+        $self->error_msg($c, "Signaturgruppe $labelgroup_urlname nicht gefunden!");
+    }
     my $label_rs = $c->stash->{labels}->search({
         printed => undef,
         deleted => undef,        
@@ -103,7 +105,7 @@ sub json : Chained('labelgroup') PathPart('json') Args(0) {
     my $page             = $data->{page} || 1;
     my $rows_per_page
         = $c->session->{rows_per_page}
-        = $data->{rows} || $c->session->{rows_per_page} || 25;
+        = $data->{rows} || $c->session->{rows_per_page} || 20;
     my $sidx             = $data->{sidx} || 'd11sig';
     my $sord             = $data->{sord} || 'asc';
 

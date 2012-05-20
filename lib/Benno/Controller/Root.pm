@@ -41,7 +41,7 @@ sub base : Chained('/') PathPart('') CaptureArgs(0) {
         roles       => [ @roles ],
         labelgroups => [$c->model('BennoDB::Labelgroup')->search($search)->all],
         can_print   => (first { 'admin'|'print' } @roles),
-        rows_per_page => $c->session->{rows_per_page} || 25,
+        rows_per_page => $c->session->{rows_per_page} || 20,
         labelgroup => $c->session->{labelgroup}, 
     );    
 }
