@@ -32,7 +32,7 @@
         [% IF title == "Administration" %]
             class="active"    
         [% END %] 
-        name="ui-icon-locked" href="[% c.uri_for_action('/label/list_admin')%]">Admin</a></li>
+        name="ui-icon-locked" href="[% c.uri_for_action('/label/list_admin')%]">Administration</a></li>
     [% END %] 
     </ul>
 </div>

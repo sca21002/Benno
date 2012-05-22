@@ -1,40 +1,13 @@
-<script type="text/javascript">    
-  
-  
-jQuery(function($){
-    $.datepicker.regional['de'] = {clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
-            closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
-            prevText: '&#x3c;zurück', prevStatus: 'letzten Monat zeigen',
-            nextText: 'Vor&#x3e;', nextStatus: 'nächsten Monat zeigen',
-            currentText: 'heute', currentStatus: '',
-            monthNames: ['Januar','Februar','März','April','Mai','Juni',
-            'Juli','August','September','Oktober','November','Dezember'],
-            monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
-            'Jul','Aug','Sep','Okt','Nov','Dez'],
-            monthStatus: 'anderen Monat anzeigen', yearStatus: 'anderes Jahr anzeigen',
-            weekHeader: 'Wo', weekStatus: 'Woche des Monats',
-            dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-            dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-            dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-            dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'Wähle D, M d',
-            dateFormat: 'dd.mm.yy', firstDay: 1, 
-            initStatus: 'Wähle ein Datum', isRTL: false};
-    $.datepicker.setDefaults($.datepicker.regional['de']);
-});
 
-datePick = function(elem)
-{
-   jQuery(elem).datepicker( { 
-	   dateFormat: 'yy-mm-dd',
-	   onSelect: function(dateText, inst) { 	
-		   var sgrid = $("#etikett")[0];
-		   sgrid.triggerToolbar();
-	    } } )	;
-}
+<script type="text/javascript" src="[% c.uri_for('/static/js/ext/plugins/jquery-cookie/jquery.cookie.js') %]"></script>
+
+<script type="text/javascript" src="[% c.uri_for('/static/js/ext/plugins/jquery.json-2.3.min.js') %]"></script>
+
+<script type="text/javascript">    
+var print_path = "[% c.uri_for_action('/label/print_selected') %]";  
 
 $(document).ready(function() {
   
-
 jQuery("#etikett").jqGrid({
     url:"[% json_url %]",
     datatype: "json",
@@ -53,55 +26,27 @@ jQuery("#etikett").jqGrid({
     rowList:[10,20,30,40,50,60,70,80,90,100],
     pager: '#pager_etikett',
     sortname: 'd11sig',
+    onSelectRow: cookie_selected,
     viewrecords: true,
     sortorder: "asc",
 	multiselect : true,
+  gridComplete: cookie_init,
+  beforeShowForm: function ($form) {
+    // get comma separated list of ids of rows which will be delete
+    // in case of multiselect:true grid or just id of the row.
+    // In the code below we suppose that single row selection are used
+    var idOfDeletedRow = $("#DelData>td:nth-child(1)").text();
+    $form.find("td.delmsg").eq(0)
+        .html("Delete record with <b>code=" +
+            $(this).jqGrid('getCell', idOfDeletedRow, 'cd') + "</b>?");
+    // REMARK: in old versions of jqGrid you can't use $(this) and
+    //         will have to use something like $("#list")
+},
+
     caption:"Etiketten",
     editurl: "[% c.uri_for_action('/label/ajax') %]"
 });
-jQuery("#etikett").jqGrid('navGrid','#pager_etikett',{
-  edit:false,
-  add:false,
-  del:false,
-  search:false});
 
-jQuery("#etikett").jqGrid('navButtonAdd','#pager_etikett',
-				{caption:"Filter zurücksetzen", onClickButton:function()
-			{ var grid = $("#etikett");
-			grid[0].clearToolbar();
-			} }); 
-
-
-$('#print_selected').click(function() {
-	var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
-		window.open("[% c.uri_for_action('/label/print_selected') %]?id="+gr);
-
-	if( gr != null ) {
-		$.ajax({
-			url: "[% c.uri_for_action('/label/print_selected') %]", 
-			data: {id: gr}
-	});
-	}
-	else alert("Bitte eine Zeile auswählen!");
-
-	$('#etikett').trigger('reloadGrid');
-
-});
-
-	$('#etikett').jqGrid('filterToolbar',  {
-			stringResult : true,
-			searchOnEnter : true
-		});
-
-
-
-$('#delete').click(function(){ 			  
-	var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow'); 
-	if( gr != null ) jQuery("#etikett").jqGrid('delGridRow',gr,{ }); 
-	else alert("Bitte eine Zeile auswählen!");
-
-	$('#etikett').trigger('reloadGrid');
-});
 
 });
 
@@ -116,12 +61,12 @@ $('#delete').click(function(){
       </li> 
       
       <li class="default">   
-      <a name='ui-icon-print' id="print_selected" href="#">Ausgewählte drucken</a>
+      <a name='ui-icon-print' id="print_selected" href="#">Auswahl drucken</a>
       </li>
  
 [% END %]
     <li>
-      <a id="delete" name="ui-icon-trash" >Ausgewählte löschen</a>
+      <a id="delete" name="ui-icon-trash" >Auswahl löschen</a>
     </li>
 
   </ul>
@@ -130,3 +75,4 @@ $('#delete').click(function(){
  <div class="ui-widget">       
  <div><table id="etikett"></table></div><div id="pager_etikett"></div></div> 
 
+<script type="text/javascript" src="[% c.uri_for('/static/js/gridfunctions.js') %]"></script>

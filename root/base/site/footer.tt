@@ -5,7 +5,7 @@
 
 <p id="name">
 	<img src="/static/images/Buch_25.png" id="book" alt="Benno Logo" title=""  />
-	Benno, letzte &Auml;nderung 14.05.2012, &copy; Universit&auml;tsbibliothek Regensburg <br />
+	Benno, letzte &Auml;nderung 21.05.2012, &copy; Universit&auml;tsbibliothek Regensburg <br />
 	<a href="[% c.uri_for_action('/label/list_admin') %]">Administration</a>
     [% IF c.user_exists %]
         | Sie sind eingeloggt als [% c.user.username %]. 

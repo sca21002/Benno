@@ -401,7 +401,7 @@ sub print_do {
     }
     my $today =
         DateTime->now( time_zone => 'Europe/Berlin' )->strftime('%y%m%d');
-    my $filename = join( '_', 'sig', $self->label_type, $today ) . '.ps';
+    my $filename = join( '_', 'sig', $label_type, $today ) . '.ps';
     $c->stash(
         current_view => 'PostScript',
 	template     => 'postscript/print.tt',

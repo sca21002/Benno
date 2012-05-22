@@ -1,173 +1,113 @@
 [% path = title; %]
-<script type="text/javascript">
 
-  
-jQuery(function($){
-    $.datepicker.regional['de'] = {clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
-            closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
-            prevText: '&#x3c;zurück', prevStatus: 'letzten Monat zeigen',
-            nextText: 'Vor&#x3e;', nextStatus: 'nächsten Monat zeigen',
-            currentText: 'heute', currentStatus: '',
-            monthNames: ['Januar','Februar','März','April','Mai','Juni',
-            'Juli','August','September','Oktober','November','Dezember'],
-            monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
-            'Jul','Aug','Sep','Okt','Nov','Dez'],
-            monthStatus: 'anderen Monat anzeigen', yearStatus: 'anderes Jahr anzeigen',
-            weekHeader: 'Wo', weekStatus: 'Woche des Monats',
-            dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-            dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-            dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-            dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'Wähle D, M d',
-            dateFormat: 'dd.mm.yy', firstDay: 1, 
-            initStatus: 'Wähle ein Datum', isRTL: false};
-    $.datepicker.setDefaults($.datepicker.regional['de']);
-});
+<script type="text/javascript" src="[% c.uri_for('/static/js/ext/plugins/jquery-cookie/jquery.cookie.js') %]"></script>
 
-datePick = function(elem)
-{
-   jQuery(elem).datepicker( { 
-	   dateFormat: 'yy-mm-dd',
-	   onSelect: function(dateText, inst) { 	
-		   var sgrid = $("#etikett")[0];
-		   sgrid.triggerToolbar();
-	    } } )	;
-}
+<script type="text/javascript" src="[% c.uri_for('/static/js/ext/plugins/jquery.json-2.3.min.js') %]"></script>
 
-
-$(document).ready(function() {
-		jQuery("#etikett").jqGrid( {
-			url : "[% json_url %]",
-			datatype : "json",
-			colNames : [ 'Signatur', 'Vom', 'Typ', 'Gedruckt am', 'Gelöscht am'],
-			colModel : [ {
-				name : 'd11sig',
-				sortable : true,
-				width : 250,
-				editable: true,
-				editoptions:{size:50}
-			}, {
-				name : 'd11tag',
-				sortable : true,
-				editable: false,
-				width : 120,
-				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
-			}, {
-				name : 'type',
-				sortable : true,
-				editable: true,
-				width : 100,
-				stype : 'select',
-				editoptions : {
-					value : "[% FOR labelgroup IN labelgroups %][% labelgroup.shortname %]:[% labelgroup.name %][%- ";" UNLESS loop.last -%][% END %]"
-				}
-			}, 
-			 {
-				name : 'printed',
-				sortable : true,
-				editable: true,
-				width : 160,
-				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
-			},
-			{
-				name : 'deleted',
-				sortable : true,
-				editable: true,
-				width : 160,
-				searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
-			}],
+<script type="text/javascript">    
+  var print_path = "[% c.uri_for_action('/label/print_selected') %]";  
+  $(document).ready(function() {
+    jQuery("#etikett").jqGrid( {
+      url : "[% json_url %]",
+      datatype : "json",
+      colNames : [ 'Signatur', 'Vom', 'Typ', 'Gedruckt am', 'Gelöscht am'],
+      colModel : [ {
+          name : 'd11sig',
+          sortable : true,
+          width : 250,
+          editable: true,
+          editoptions:{size:50}
+        }, {
+          name : 'd11tag',
+          sortable : true,
+          editable: false,
+          width : 120,
+          searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
+        }, {
+          name : 'type',
+          sortable : true,
+          editable: true,
+          width : 100,
+          stype : 'select',
+          editoptions : {
+            value : "[% FOR labelgroup IN labelgroups %][% labelgroup.urlname %]:[% labelgroup.name %][%- ";" UNLESS loop.last -%][% END %]"
+          }
+        }, 
+        {
+          name : 'printed',
+          sortable : true,
+          editable: true,
+          width : 160,
+          searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
+        },
+        {
+          name : 'deleted',
+          sortable : true,
+          editable: true,
+          width : 160,
+          searchoptions:{dataInit:datePick, attr:{title:'Datum auswählen'}} 
+        }],
     
-			rowNum : 25,
-			height : "100%",
-			width : "778",
-			rowList : [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-			pager : '#pager_etikett',
-			sortname : 'd11tag',
-			viewrecords : true,
-			sortorder : "desc",
-			multiselect : true,
-			toppager: true,
-			caption : "Etiketten",
-			editurl: "[% c.uri_for_action('/label/ajax') %]"
-		});
+      rowNum : 25,
+      height : "100%",
+      width : "778",
+      rowList : [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+      pager : '#pager_etikett',
+      sortname : 'd11tag',
+      viewrecords : true,
+      sortorder : "desc",
+      multiselect : true,
+      gridComplete: cookie_init,
+      onSelectRow: cookie_selected,
+      toppager: true,
+      caption : "Etiketten",
+      editurl: "[% c.uri_for_action('/label/ajax') %]"
+    });
+
 		
-		jQuery("#etikett").jqGrid('navGrid', '#pager_etikett', {
-			edit : false,
-			add : false,
-			del : false,
-      search: false		});
 
-
-		jQuery("#etikett").jqGrid('navButtonAdd','#pager_etikett',
-				{caption:"Filter zurücksetzen", onClickButton:function()
-			{ var grid = $("#etikett");
-			grid[0].clearToolbar();
-			} }); 
-
-
-		jQuery("#etikett").jqGrid('navButtonAdd','#etikett_toppager',
-				{caption:"Filter zurücksetzen", onClickButton:function()
-			{ var grid = $("#etikett");
-			grid[0].clearToolbar();
-			} }); 
-
-		$("ul#navigation li a").each(function(n) {
-			if (this.id == "[% path %]") {
-				$(this).parent().attr("class", "active");
-			}
-		    if ("[% path %]" == "list") {
-				$("ul#navigation li:first-child").attr("class", "active");
+    $("ul#navigation li a").each(function(n) {
+      if (this.id == "[% path %]") {
+        $(this).parent().attr("class", "active");
+      }
+      if ("[% path %]" == "list") {
+        $("ul#navigation li:first-child").attr("class", "active");
 
 				
-			}
-		});
+      }
+    });
 
-	
-		
-		$('#print_selected').click(function() {
-			var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
-		window.open("[% c.uri_for_action('/label/print_selected') %]?id="+gr);
- 		
-			if( gr != null ) {
-				$.ajax({
-			url: "[% c.uri_for_action('/label/print_selected') %]", 
-			data: {id: gr}
-				});
-			}
-			else alert("Bitte eine Zeile auswählen!");
+    $('#reset_selected').click(function() {
+      ids = get_selected_ids();
+      gr = ids.join();
+    
+      if( gr.length != 0 ) { 
+        $.ajax({
+          url: "[% c.uri_for_action('/label/reset_selected') %]", 
+          data: {id: gr},
+          success:  function(response){ 
+  
+           
+              $("span.message").remove();
+              $("span.error").prepend("<span class='message'> " + ids.length+
+                " Signatur(en) erfolgreich zurückgesetzt. </span>");
+              $("span.message").delay(1800).fadeOut(600);
+            
+        
+          } 
+        });
+        
+        clean_up();
+      }
+      else alert("Bitte eine Zeile auswählen!");
 
-			$('#etikett').trigger('reloadGrid');
+      $('#etikett').trigger('reloadGrid');
 
-		});
-                
-		$('#reset_selected').click(function() {
-			var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow').join(); 
-                    if( gr != null ) {
-				$.ajax({
-			url: "[% c.uri_for_action('/label/reset_selected') %]", 
-			data: {id: gr}
-				});
-			}
-			else alert("Bitte eine Zeile auswählen!");
-
-			$('#etikett').trigger('reloadGrid');
-
-		});
-
-		$('#etikett').jqGrid('filterToolbar',  {
-			stringResult : true,
-			searchOnEnter : true
-		});
+    });
+               
 
 
-	
-		$('#delete').click(function(){ 			  
-			var gr = jQuery("#etikett").jqGrid('getGridParam','selarrrow'); 
-			if( gr != null ) jQuery("#etikett").jqGrid('delGridRow',gr,{ }); 
-			else alert("Bitte eine Zeile auswählen!");
-
-			$('#etikett').trigger('reloadGrid');
-		});
-	});
+  });
 </script>
 
 
@@ -179,31 +119,41 @@ $(document).ready(function() {
 
 <ul id="subnav">
 
-      <li class="default">   
-      <a name='ui-icon-print' 
-        href="[% c.uri_for_action('/label/print', c.req.captures) %]">Alle drucken</a>
-      </li> 
-      
-      <li class="default">   
-      <a name='ui-icon-print' id="print_selected" href="#">Auswahl drucken</a>
-      </li>
-      
- 
-    <li>
-      <a id="delete" name="ui-icon-trash" >Auswahl löschen</a>
-    </li>
-    
-    <li class="default">   
-      <a name='ui-icon-arrowrefresh-1-n' id="reset_selected" href="#">Auswahl zurücksetzen</a>
-      </li>
+  <li class="default">   
+    <a name='ui-icon-print' 
+       href="[% c.uri_for_action('/label/print', c.req.captures) %]">Alle drucken</a>
+  </li> 
 
-  </ul>
+  <li class="default">   
+    <a name='ui-icon-print' id="print_selected" href="#">Auswahl drucken</a>
+  </li>
+
+
+  <li>
+    <a id="delete" name="ui-icon-trash" >Auswahl löschen</a>
+  </li>
+
+  <li class="default">   
+    <a name='ui-icon-arrowrefresh-1-n' id="reset_selected" href="#">Auswahl zurücksetzen</a>
+  </li>
+
+</ul>
 
 
 
 <div class="ui-widget">
-<div>
-<table id="etikett"></table>
+  <div>
+    <table id="etikett"></table>
+  </div>
+  <div id="pager_etikett"></div>
 </div>
-<div id="pager_etikett"></div>
-</div>
+<script type="text/javascript" src="[% c.uri_for('/static/js/gridfunctions.js') %]"></script>
+
+
+
+<script>
+  
+  $(document).ready(function() {
+
+  });
+</script>

@@ -51,7 +51,7 @@ sub index : Chained('/base') PathPart('index') Args(0) {}
 sub home : Chained('/base') PathPart('') Args {
     my ($self, $c) = @_;
         
-    my $lg = $c->session->{labelgroup}->urlname;
+    my $lg = $c->session->{labelgroup} &&  $c->session->{labelgroup}->urlname;
     if ( $lg ) {
         $c->res->redirect( $c->uri_for_action( '/label/list', [$lg] ) );
     } else {

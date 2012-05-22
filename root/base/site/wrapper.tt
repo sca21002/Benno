@@ -12,9 +12,9 @@
 
 <div id="content">
 [%# Status and error messages %]
-        [% IF status_msg || c.request.params.status_msg %]
+        [% #IF status_msg || c.request.params.status_msg %]
         <span class="message">[% status_msg || c.request.params.status_msg | html %]</span>
-        [% END %]
+        [% #END %]
         <span class="error">[% error_msg %]</span>
 
 [% content %]
