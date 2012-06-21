@@ -31,7 +31,7 @@ The root page (/)
 sub base : Chained('/') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
 
-
+    unless ($c->req->address =~ /^132.199.14[456]/) { $c->res->redirect($c->uri_for_action( '/login/login' ) );}
     my @roles = ( $c->model('BennoDB::Client')->roles($c->req->address) );
     push @roles, $c->user->roles if $c->user;  
     

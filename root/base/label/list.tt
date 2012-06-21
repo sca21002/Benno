@@ -31,19 +31,7 @@ jQuery("#etikett").jqGrid({
     sortorder: "asc",
 	multiselect : true,
   gridComplete: cookie_init,
-  beforeShowForm: function ($form) {
-    // get comma separated list of ids of rows which will be delete
-    // in case of multiselect:true grid or just id of the row.
-    // In the code below we suppose that single row selection are used
-    var idOfDeletedRow = $("#DelData>td:nth-child(1)").text();
-    $form.find("td.delmsg").eq(0)
-        .html("Delete record with <b>code=" +
-            $(this).jqGrid('getCell', idOfDeletedRow, 'cd') + "</b>?");
-    // REMARK: in old versions of jqGrid you can't use $(this) and
-    //         will have to use something like $("#list")
-},
-
-    caption:"Etiketten",
+  caption:"Etiketten",
     editurl: "[% c.uri_for_action('/label/ajax') %]"
 });
 
