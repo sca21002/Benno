@@ -5,7 +5,7 @@ use version; our $VERSION = qv('0.0.1');
 use warnings;
 use strict;
 use Moose;
-use Perl6::Say;
+use Modern::Perl;
 use utf8;
 use List::MoreUtils qw(any none pairwise);
 
