@@ -6,31 +6,53 @@ use lib "$FindBin::Bin/../../lib";
 use UBR::Sisis::Schema;
 use Benno::Schema;
 use UBR::Signatur;
-use DateTime::Format::Strptime;
 use DateTime::Format::MySQL;
 use Carp;
 use Data::Dumper;
-use Log::Log4perl;
+use Log::Log4perl qw(:easy);
+use IO::All;
 
+### Logdatei initialisieren
+my $logfile = "$FindBin::Bin/../../log/get_labels_from_file.log";
+Log::Log4perl->easy_init(
+    { level   => $DEBUG,
+      file    => ">" . $logfile,
+    },
+    { level   => $DEBUG,
+      file    => 'STDOUT',
+    },
+);
 
 my $now = DateTime->now(time_zone => 'Europe/Berlin');
-my $hour = $now->hour;
-my $dow  = $now->day_of_week;                                   #  (Montag = 1)
 
-exit if $hour <= 6 and $hour >= 21;
-exit if $hour != 20 and ( $dow == 6 or $dow == 7 ); 
+INFO("get_label_from_file.pl gestartet.");
 
+LOGDIE("Aufruf: get_labels_from_file.pl datei")
+    unless @ARGV == 1;
 
+my ($filename) = @ARGV;
 
-Log::Log4perl::init("$FindBin::Bin/../../log4perl.conf");
-my $root_logger = Log::Log4perl->get_logger();
-my $etikett_logger = Log::Log4perl->get_logger('Etikett');
+my ($month_of_file, $day_of_file)  = $filename =~ /sig_(\d{2})\.(\d{2})/
+    or LOGDIE("Falscher Dateiname $filename");
 
-$root_logger->info("get_label_from_sisis.pl gestartet.");
+INFO("Tag: $day_of_file Monat: $month_of_file");
 
-if ($hour >= 13 and $hour < 14) {
-    $etikett_logger->info("Benno wünscht einen angenehmen Nachmittag");
-} 
+my $date_of_file = DateTime->new(
+    year       => $now->year,
+    month      => $month_of_file,
+    day        => $day_of_file,
+    time_zone => 'Europe/Berlin'
+);
+
+INFO('Date of file: ' . $date_of_file->strftime('%d.%m.%Y'));
+
+$date_of_file = DateTime::Format::MySQL->format_datetime(
+    $date_of_file
+);
+INFO("Date of file (MySQL): ", $date_of_file);
+
+my @lines = io($filename)->chomp->slurp;
+INFO("$filename eingelesen mit " . scalar @lines . ' Zeilen');
 
 my $DB_sisis = "ubrsis";
 my $port_sisis = 4000;
@@ -46,15 +68,6 @@ my $param_benno = {
     AutoCommit => 1,
     mysql_enable_utf8   => 1,
 };
-
-
-my $Sybase_Strp = new DateTime::Format::Strptime(
-                                pattern     => '%d.%m.%Y',
-                                locale      => 'de_DE',
-                                time_zone   => 'Europe/Berlin',
-                                on_error    => 'croak',
-);
-
 
 
 # my @branches_excluded = (1, 2, 3, 4, 6, 18);
@@ -85,30 +98,34 @@ my $branches_excluded_clause = 'NOT IN (' . join(',', @branches_excluded) . ')';
 
 # my $test_sig = '= \'40/QP 210 H459\'';
 
-my @labels
-    = $schema_sisis
-        ->resultset('D11rueck')->search(
-            {
-                # 'me.d11sig'   => \$test_sig,
-                'me.d11zweig' => \$branches_excluded_clause,
-            },
-            {
-                join => 'd01buch',
-                '+select' => [
-                            'd01buch.d01gsi',
-                            'd01buch.d01entl',
-                            'd01buch.d01mtyp',
-                            \'CONVERT(CHAR(10), me.d11tag, 104)',
-                ],
-                '+as'     => [ 'd01gsi', 'd01entl',  'd01mtyp', 'd11tag' ],
-            }
-        );
-        
-my @data = map { {$_->get_columns} } @labels;
+
+my @data;
+
+foreach my $label (@lines) {
+    next unless $label =~ m#/#; 
+    $label =~ s/^\s+|\s+$//g;
+    next if $label =~ $labels_excluded_reg;
+    my $where_clause = " = '$label'";
+    my $book_rs = $schema_sisis->resultset('D01buch')->search(
+        {
+            d01ort => \$where_clause,
+            d01zweig => \$branches_excluded_clause,
+        }
+    );
+    if (my $book = $book_rs->next) {
+        push @data, {
+                        d11sig  => $book->d01ort,
+                        d01gsi  => $book->d01gsi,
+                        d01entl => $book->d01entl,
+                        d01mtyp => $book->d01mtyp,
+                        d11tag => $now,
+                    };
+    }
+}
 
 foreach my $data (@data) {
     next if $data->{d11sig} =~ $labels_excluded_reg;  
-
+    TRACE('Label: ', $data->{d11sig});
     my $label;
     eval {
         $label = UBR::Signatur->new_from_string( $data->{d11sig} );
@@ -133,25 +150,27 @@ foreach my $data (@data) {
         $data->{type} = 'error';
     }
     $data->{d11tag} = DateTime::Format::MySQL->format_datetime(
-        $Sybase_Strp->parse_datetime($data->{d11tag})
+        $data->{d11tag}
     );
-    my $row = $schema_benno->resultset('Label')->find(
+    my @rows = $schema_benno->resultset('Label')->search(
         {
             d11sig => $data->{d11sig},
-            d11tag => $data->{d11tag},
+            d11tag => { '>=' => $date_of_file },
         },
-        { key => 'd11sig' }
-    );
-    if (defined $row) {
-        $row->update($data);     
+    )->all;
+    if (@rows) {
+        INFO($data->{d11sig} . " bereits vorhanden!");
     }
     else {
         $schema_benno->resultset('Label')->create($data);
-        $etikett_logger->warn($data->{d11sig}. ": " . $msg || '<ohne Fehlermeldung>')
-            if $data->{type} eq 'error';
+        if ($data->{type} eq 'error') {
+            WARN($data->{d11sig}. ": " . $msg || '<ohne Fehlermeldung>')
+        } else {   
+            INFO($data->{d11sig} . " gespeichert!");
+        }
     }    
 }
-$root_logger->info("get_label_from_sisis.pl beendet.");
+INFO("get_label_form_file.pl beendet.");
 
 
 
