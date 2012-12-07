@@ -13,9 +13,11 @@ setpagedevice
 /QuerFlag 0 def
 /RotesEtikett 
 {% A4-Seite: Bild wird um 90 Grad gedreht
-138 10 translate    % nur für Solo 80
+% 138 10 translate    % nur für Solo 80
+8 70 translate      % nur für Solo 51
 0 0 moveto           % immer zum Ursprung des aktuellen Koord.systems
-90 rotate
+% 90 rotate
+270 rotate
  /XKoord 100 def  % Start X-Kordinate
 } bind def
 
