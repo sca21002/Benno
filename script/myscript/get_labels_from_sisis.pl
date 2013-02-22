@@ -11,6 +11,7 @@ use DateTime::Format::MySQL;
 use Carp;
 use Data::Dumper;
 use Log::Log4perl;
+use Log::Log4perl::Util::TimeTracker;
 
 
 my $now = DateTime->now(time_zone => 'Europe/Berlin');
@@ -25,6 +26,7 @@ exit if $hour != 20 and ( $dow == 6 or $dow == 7 );
 Log::Log4perl::init("$FindBin::Bin/../../log4perl.conf");
 my $root_logger = Log::Log4perl->get_logger();
 my $etikett_logger = Log::Log4perl->get_logger('Etikett');
+my $timer = Log::Log4perl::Util::TimeTracker->new();
 
 $root_logger->info("get_label_from_sisis.pl gestartet.");
 
