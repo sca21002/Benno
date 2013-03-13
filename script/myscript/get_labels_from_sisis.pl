@@ -33,9 +33,8 @@ if ($hour >= 13 and $hour < 14) {
 } 
 
 my $DB_sisis = "ubrsis";
-my $port_sisis = 4000;
-my $dsn_sisis = "dbi:Sybase:server=ubrz2.bib-bvb.de:$port_sisis;"
-                . "database=$DB_sisis;timeout=10";
+my $dsn_sisis = "dbi:Sybase:server=sokrates;"
+                . "database=$DB_sisis;timeout=600";
 my $user_sisis = "crystal";
 my $password_sisis = "***REMOVED***";
   
@@ -81,6 +80,8 @@ my $schema_benno = Benno::Schema->connect(
    $param_benno,
 );
 
+$root_logger->info("Verbindung zu den Datenbanken hergestellt.");
+
 my $branches_excluded_clause = 'NOT IN (' . join(',', @branches_excluded) . ')';
 
 # my $test_sig = '= \'40/QP 210 H459\'';
@@ -103,11 +104,17 @@ my @labels
                 '+as'     => [ 'd01gsi', 'd01entl',  'd01mtyp', 'd11tag' ],
             }
         );
+
+$root_logger->info("Suche in D11rueck abgeschlossen.");
+
         
 my @data = map { {$_->get_columns} } @labels;
 
 foreach my $data (@data) {
     next if $data->{d11sig} =~ $labels_excluded_reg;  
+
+    my $i++;
+    $root_logger->info($i . ' Siganturen bearbeitet') if $i % 100 == 0;
 
     my $label;
     eval {
