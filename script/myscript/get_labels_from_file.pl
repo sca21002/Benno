@@ -55,9 +55,8 @@ my @lines = io($filename)->chomp->slurp;
 INFO("$filename eingelesen mit " . scalar @lines . ' Zeilen');
 
 my $DB_sisis = "ubrsis";
-my $port_sisis = 4000;
-my $dsn_sisis = "dbi:Sybase:server=ubrz2.bib-bvb.de:$port_sisis;"
-                . "database=$DB_sisis;timeout=10";
+my $dsn_sisis = "dbi:Sybase:server=sokrates;"
+                . "database=$DB_sisis;timeout=600";
 my $user_sisis = "crystal";
 my $password_sisis = "***REMOVED***";
   
