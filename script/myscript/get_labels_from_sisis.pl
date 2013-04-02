@@ -29,6 +29,8 @@ my $etikett_logger = Log::Log4perl->get_logger('Etikett');
 my $timer = Log::Log4perl::Util::TimeTracker->new();
 
 $root_logger->info("get_label_from_sisis.pl gestartet.");
+$root_logger->info("ENV:\n" . Dumper(%ENV));
+
 
 if ($hour >= 13 and $hour < 14) {
     $etikett_logger->info("Benno wünscht einen angenehmen Nachmittag");
@@ -65,7 +67,7 @@ my @branches_excluded = (1, 2, 3, 4, 6);
 my $labels_excluded_reg = qr{
     \A
     (?:
-        96/|215/|251/|261/|285/|300/|6301/|999/|999[2-579]|241/ARBG|W[ ] 
+        96/|215/|251/|261/|285/|300/|6301/|9980/|999/|999[2-579]|241/ARBG|W[ ] 
     )    
 }xms;
 
@@ -74,6 +76,8 @@ my $schema_sisis = UBR::Sisis::Schema->connect(
     $user_sisis,
     $password_sisis,
 );
+
+$root_logger->logdie('Keine Verbindung zur Sisis-Datenbank') unless $schema_sisis;
 
 my $schema_benno = Benno::Schema->connect(
    $dsn_benno,
